@@ -1,3 +1,5 @@
+alert("script.js loaded");
+
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 const MAX_FILE_SIZE_MB = 50;
 
