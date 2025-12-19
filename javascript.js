@@ -3,16 +3,25 @@ const MAX_FILE_SIZE_MB = 50;
 // ปุ่มถัดไป → เปิด modal ยืนยัน
 document.getElementById("btnNext").addEventListener("click", () => {
   const f = document.getElementById("formData");
-  if (!f.checkValidity()) { f.reportValidity(); return; }
-
   const file = document.getElementById("pdfFile").files[0];
-  if (!file) { alert("กรุณาเลือกไฟล์ PDF"); return; }
 
-  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { 
-    alert(`ไฟล์มีขนาดเกิน ${MAX_FILE_SIZE_MB} MB กรุณาเลือกไฟล์ขนาดเล็กกว่า`);
-    return; 
+  // ตรวจสอบข้อมูลครบ
+  if (!f.date.value || !f.title.value || !f.owner.value) {
+    alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+    return;
   }
 
+  if (!file) {
+    alert("กรุณาเลือกไฟล์ PDF");
+    return;
+  }
+
+  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+    alert(`ไฟล์มีขนาดเกิน ${MAX_FILE_SIZE_MB} MB กรุณาเลือกไฟล์ขนาดเล็กกว่า`);
+    return;
+  }
+
+  // แสดงข้อมูลใน modal confirm
   document.getElementById("confirmText").innerHTML = `
     <b>วันที่:</b> ${f.date.value}<br>
     <b>เรื่อง:</b> ${f.title.value}<br>
@@ -26,12 +35,17 @@ document.getElementById("btnNext").addEventListener("click", () => {
 
 // ปุ่มยืนยันส่งข้อมูล → ส่งไป GAS
 document.getElementById("btnSubmit").addEventListener("click", async () => {
+  // ปิด modal confirm
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
+
+  // เปิด modal loading
   const loading = new bootstrap.Modal(document.getElementById("loadingModal"));
   loading.show();
 
   const f = document.getElementById("formData");
   const file = document.getElementById("pdfFile").files[0];
+
+  // เตรียม FormData
   const formData = new FormData();
   formData.append("data", JSON.stringify({
     date: f.date.value,
@@ -42,7 +56,7 @@ document.getElementById("btnSubmit").addEventListener("click", async () => {
   formData.append("pdf", file);
 
   try {
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // <-- เปลี่ยนตรงนี้
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // เปลี่ยนเป็น URL Web App ของคุณ
     const res = await fetch(GAS_URL, { method: "POST", body: formData });
     const result = await res.json();
 
