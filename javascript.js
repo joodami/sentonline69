@@ -5,8 +5,12 @@ document.getElementById("btnNext").addEventListener("click", () => {
   const f = document.getElementById("formData");
   const file = document.getElementById("pdfFile").files[0];
 
-  // ตรวจสอบข้อมูลครบ
-  if (!f.date.value || !f.title.value || !f.owner.value) {
+  const date = f.elements['date'].value.trim();
+  const title = f.elements['title'].value.trim();
+  const owner = f.elements['owner'].value.trim();
+  const note = f.elements['note'].value.trim();
+
+  if (!date || !title || !owner) {
     alert("กรุณากรอกข้อมูลให้ครบถ้วน");
     return;
   }
@@ -21,12 +25,11 @@ document.getElementById("btnNext").addEventListener("click", () => {
     return;
   }
 
-  // แสดงข้อมูลใน modal confirm
   document.getElementById("confirmText").innerHTML = `
-    <b>วันที่:</b> ${f.date.value}<br>
-    <b>เรื่อง:</b> ${f.title.value}<br>
-    <b>ผู้เสนอ:</b> ${f.owner.value}<br>
-    <b>หมายเหตุ:</b> ${f.note.value || "-"}<br>
+    <b>วันที่:</b> ${date}<br>
+    <b>เรื่อง:</b> ${title}<br>
+    <b>ผู้เสนอ:</b> ${owner}<br>
+    <b>หมายเหตุ:</b> ${note || "-"}<br>
     <b>ไฟล์:</b> ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
   `;
 
@@ -35,23 +38,19 @@ document.getElementById("btnNext").addEventListener("click", () => {
 
 // ปุ่มยืนยันส่งข้อมูล → ส่งไป GAS
 document.getElementById("btnSubmit").addEventListener("click", async () => {
-  // ปิด modal confirm
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
-
-  // เปิด modal loading
   const loading = new bootstrap.Modal(document.getElementById("loadingModal"));
   loading.show();
 
   const f = document.getElementById("formData");
   const file = document.getElementById("pdfFile").files[0];
 
-  // เตรียม FormData
   const formData = new FormData();
   formData.append("data", JSON.stringify({
-    date: f.date.value,
-    title: f.title.value,
-    owner: f.owner.value,
-    note: f.note.value
+    date: f.elements['date'].value,
+    title: f.elements['title'].value,
+    owner: f.elements['owner'].value,
+    note: f.elements['note'].value
   }));
   formData.append("pdf", file);
 
@@ -65,10 +64,10 @@ document.getElementById("btnSubmit").addEventListener("click", async () => {
     if (result.status === "success") {
       document.getElementById("successDetail").innerHTML = `
         <b>ลำดับเอกสาร:</b> ${result.number}<br>
-        <b>วันที่:</b> ${f.date.value}<br>
-        <b>เรื่อง:</b> ${f.title.value}<br>
-        <b>ผู้เสนอ:</b> ${f.owner.value}<br>
-        <b>หมายเหตุ:</b> ${f.note.value || "-"}<br>
+        <b>วันที่:</b> ${f.elements['date'].value}<br>
+        <b>เรื่อง:</b> ${f.elements['title'].value}<br>
+        <b>ผู้เสนอ:</b> ${f.elements['owner'].value}<br>
+        <b>หมายเหตุ:</b> ${f.elements['note'].value || "-"}<br>
         <b>ไฟล์:</b> <a href="${result.pdfUrl}" target="_blank">${file.name}</a>
       `;
       f.reset();
