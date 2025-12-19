@@ -42,7 +42,7 @@ document.getElementById("btnSubmit").addEventListener("click", async () => {
   formData.append("pdf", file);
 
   try {
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // เปลี่ยนเป็น URL Web App ของคุณ
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // <-- เปลี่ยนตรงนี้
     const res = await fetch(GAS_URL, { method: "POST", body: formData });
     const result = await res.json();
 
