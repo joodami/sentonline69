@@ -3,3 +3,7 @@ body { font-family: 'K2D', sans-serif; background: #f0f4ff; }
 .custom-btn { background:#0d6efd; color:white; font-size:18px; }
 form label { font-weight: 600; }
 .card-text b { font-weight: 500; }
+
+.modal-gradient-blue { background: linear-gradient(135deg,#f0f8ff,#d0e7ff); }
+.modal-gradient-lightblue { background: linear-gradient(135deg,#e0f7ff,#b0e0ff); }
+.modal-gradient-green { background: linear-gradient(135deg,#e6ffed,#b8f0c7); }
