@@ -1,5 +1,5 @@
 const MAX_FILE_SIZE_MB = 50;
-const GAS_URL = "YOUR_GAS_WEB_APP_URL"; // ใส่ URL ของ Web App ของคุณ
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // ใส่ URL ของ Web App ของคุณ
 
 document.getElementById("btnNext").addEventListener("click", openConfirmModal);
 document.getElementById("btnSubmit").addEventListener("click", submitData);
