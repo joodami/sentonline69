@@ -1,3 +1,5 @@
+alert("script.js loaded");
+
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 const MAX_FILE_SIZE_MB = 50;
 
@@ -5,10 +7,6 @@ const form = document.getElementById("formData");
 const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
-
-const confirmModal = new bootstrap.Modal(document.getElementById("confirmModal"));
-const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
-const successModal = new bootstrap.Modal(document.getElementById("successModal"));
 
 btnNext.addEventListener("click", () => {
 
@@ -30,11 +28,21 @@ btnNext.addEventListener("click", () => {
     <b>ไฟล์:</b> ${file.name}
   `;
 
-  confirmModal.show();
+  new bootstrap.Modal(
+    document.getElementById("confirmModal")
+  ).show();
 });
 
-btnSubmit.addEventListener("click", async () => {
-  confirmModal.hide();
+btnSubmit.addEventListener("click", () => {
+
+  const confirmInstance = bootstrap.Modal.getInstance(
+    document.getElementById("confirmModal")
+  );
+  confirmInstance.hide();
+
+  const loadingModal = new bootstrap.Modal(
+    document.getElementById("loadingModal")
+  );
   loadingModal.show();
 
   const reader = new FileReader();
@@ -57,7 +65,9 @@ btnSubmit.addEventListener("click", async () => {
     const res = await fetch(GAS_URL, { method: "POST", body: fd });
     const r = await res.json();
 
-    loadingModal.hide();
+    bootstrap.Modal.getInstance(
+      document.getElementById("loadingModal")
+    ).hide();
 
     if (r.status === "success") {
       document.getElementById("successDetail").innerHTML = `
@@ -66,7 +76,10 @@ btnSubmit.addEventListener("click", async () => {
       `;
       document.getElementById("qrCodeImg").src = r.qrCodeUrl;
       form.reset();
-      successModal.show();
+
+      new bootstrap.Modal(
+        document.getElementById("successModal")
+      ).show();
     } else {
       alert(r.message);
     }
