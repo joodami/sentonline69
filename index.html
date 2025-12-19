@@ -1,78 +1,63 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบเสนอเซ็นออนไลน์</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="style.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เสนอเซ็นออนไลน์</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-3 col-lg-10">
-
-  <img src="https://github.com/joodami/school-assets/blob/main/banner%20senonline69.jpg?raw=true"
-       class="img-fluid rounded shadow mb-4">
-
+  <img src="YOUR_BANNER_URL" class="img-fluid rounded shadow mb-4">
   <div class="card shadow form-card p-4 mb-4">
     <h3 class="text-center mb-4 fw-bold text-primary">ระบบเสนอเซ็นออนไลน์</h3>
     <form id="formData">
       <label>วันที่</label>
       <input type="text" name="date" class="form-control mb-2" required>
-
       <label>เรื่อง</label>
       <textarea name="title" class="form-control mb-2" rows="1" required></textarea>
-
       <label>ผู้เสนอ</label>
       <input type="text" name="owner" class="form-control mb-2" required>
-
       <label>หมายเหตุ</label>
       <textarea name="note" class="form-control mb-3"></textarea>
-
       <label>อัปโหลดไฟล์ PDF</label>
       <input type="file" id="pdfFile" accept="application/pdf" class="form-control mb-3" required>
-
-      <button type="button" id="nextBtn" class="btn custom-btn w-100">ถัดไป</button>
+      <button type="button" id="btnNext" class="btn custom-btn w-100">ถัดไป</button>
     </form>
-  </div>
-
-  <div class="text-center mt-4 mb-4 text-secondary">
-    © 2569 งานสารบรรณโรงเรียน สำนักงานอำนวยการ 
   </div>
 </div>
 
-<!-- Modal Confirm -->
-<div class="modal fade" id="confirmModal" data-bs-backdrop="static" data-bs-keyboard="false">
+<!-- Modals (เหมือนเดิม) -->
+<div id="confirmModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content shadow-lg rounded-4 border-0 modal-confirm">
+    <div class="modal-content shadow-lg rounded-4 border-0" style="background: linear-gradient(135deg,#f0f8ff,#d0e7ff);">
       <div class="modal-header border-0 justify-content-center py-2">
         <h5 class="modal-title fw-bold text-primary m-0">🔍 ตรวจสอบข้อมูล</h5>
       </div>
       <div class="modal-body text-start py-2" id="confirmText"></div>
       <div class="modal-footer flex-column border-0 py-2">
-        <button class="btn btn-primary w-100 py-2 mb-1" id="submitBtn">✅ ยืนยันส่งข้อมูล</button>
+        <button class="btn btn-primary w-100 py-2 mb-1" id="btnSubmit">✅ ยืนยันส่งข้อมูล</button>
         <button class="btn btn-secondary w-100 py-2" data-bs-dismiss="modal">✏️ แก้ไขข้อมูล</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal Loading -->
-<div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false">
+<div id="loadingModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content shadow-lg rounded-4 border-0 modal-loading">
+    <div class="modal-content shadow-lg rounded-4 border-0" style="background: linear-gradient(135deg,#e0f7ff,#b0e0ff);">
       <div class="modal-body text-center py-3">
-        <div class="spinner-border text-primary mb-2" role="status"><span class="visually-hidden">Loading...</span></div>
+        <div class="spinner-border text-primary mb-2" role="status"></div>
         <h5 class="fw-bold mb-0">กำลังส่งข้อมูล กรุณารอสักครู่...</h5>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal Success -->
-<div class="modal fade" id="successModal" data-bs-backdrop="static" data-bs-keyboard="false">
+<div id="successModal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content shadow-lg rounded-4 border-0 modal-success">
+    <div class="modal-content shadow-lg rounded-4 border-0" style="background: linear-gradient(135deg,#e6ffed,#b8f0c7);">
       <div class="modal-header border-0 justify-content-center py-2">
         <h4 class="modal-title fw-bold text-success m-0">🎉 ส่งข้อมูลสำเร็จ</h4>
       </div>
@@ -85,6 +70,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="javascript.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
