@@ -1,6 +1,6 @@
 const MAX_FILE_SIZE_MB = 50;
 // ใส่ Web App URL ของ Google Apps Script ที่ Deploy เป็น Web App แล้ว
-const GAS_WEB_APP_URL = "https://script.google.com/macros/s/YOUR_WEB_APP_ID/exec";
+const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 
 function getFormData() {
   const f = document.getElementById("formData");
