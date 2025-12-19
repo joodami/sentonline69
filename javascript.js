@@ -1,93 +1,77 @@
 const MAX_FILE_SIZE_MB = 50;
+// ใส่ Web App URL ของ Google Apps Script ที่ Deploy เป็น Web App แล้ว
+const GAS_WEB_APP_URL = "https://script.google.com/macros/s/YOUR_WEB_APP_ID/exec";
 
-document.getElementById("nextBtn").addEventListener("click", openConfirmModal);
-
-function openConfirmModal(){
+function getFormData() {
   const f = document.getElementById("formData");
-  if(!f.checkValidity()){ f.reportValidity(); return; }
-
-  const file = document.getElementById("pdfFile").files[0];
-  if(!file){ alert("กรุณาเลือกไฟล์ PDF"); return; }
-  if(file.size > MAX_FILE_SIZE_MB*1024*1024){ alert(`ไฟล์มีขนาดเกิน ${MAX_FILE_SIZE_MB} MB`); return; }
-
-  const modalHtml = `
-<div class="modal fade" id="confirmModal" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content shadow-lg rounded-4 border-0" style="background: linear-gradient(135deg,#f0f8ff,#d0e7ff);">
-      <div class="modal-header border-0 justify-content-center py-2">
-        <h5 class="modal-title fw-bold text-primary m-0">🔍 ตรวจสอบข้อมูล</h5>
-      </div>
-      <div class="modal-body text-start py-2" style="line-height:1.4; word-wrap: break-word;">
-        <b>วันที่:</b> ${f.date.value}<br>
-        <b>เรื่อง:</b> ${f.title.value}<br>
-        <b>ผู้เสนอ:</b> ${f.owner.value}<br>
-        <b>หมายเหตุ:</b> ${f.note.value || "-"}<br>
-        <b>ไฟล์:</b> ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)
-      </div>
-      <div class="modal-footer flex-column border-0 py-2">
-        <button class="btn btn-primary w-100 py-2 mb-1" id="confirmSendBtn">✅ ยืนยันส่งข้อมูล</button>
-        <button class="btn btn-secondary w-100 py-2" data-bs-dismiss="modal">✏️ แก้ไขข้อมูล</button>
-      </div>
-    </div>
-  </div>
-</div>`;
-  document.getElementById("modals").innerHTML = modalHtml;
-  const modal = new bootstrap.Modal(document.getElementById("confirmModal"));
-  modal.show();
-  document.getElementById("confirmSendBtn").addEventListener("click", ()=>submitData(f,file,modal));
+  return {
+    date: f.date.value,
+    title: f.title.value,
+    owner: f.owner.value,
+    note: f.note.value,
+    file: document.getElementById("pdfFile").files[0]
+  };
 }
 
-function submitData(form,file,modal){
-  modal.hide();
-  const loadingModalHtml = `
-<div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content shadow-lg rounded-4 border-0" style="background: linear-gradient(135deg,#e0f7ff,#b0e0ff);">
-      <div class="modal-body text-center py-3">
-        <div class="spinner-border text-primary mb-2" role="status"></div>
-        <h5 class="fw-bold mb-0">กำลังส่งข้อมูล กรุณารอสักครู่...</h5>
-      </div>
-    </div>
-  </div>
-</div>`;
-  document.getElementById("modals").innerHTML = loadingModalHtml;
+function openConfirmModal() {
+  const data = getFormData();
+  if (!data.date || !data.title || !data.owner || !data.file) {
+    alert("กรุณากรอกข้อมูลให้ครบและเลือกไฟล์ PDF");
+    return;
+  }
+  if (data.file.size > MAX_FILE_SIZE_MB*1024*1024) {
+    alert(`ไฟล์เกิน ${MAX_FILE_SIZE_MB} MB`);
+    return;
+  }
+
+  document.getElementById("confirmText").innerHTML = `
+    <b>วันที่:</b> ${data.date}<br>
+    <b>เรื่อง:</b> ${data.title}<br>
+    <b>ผู้เสนอ:</b> ${data.owner}<br>
+    <b>หมายเหตุ:</b> ${data.note || "-"}<br>
+    <b>ไฟล์:</b> ${data.file.name} (${(data.file.size/1024/1024).toFixed(2)} MB)
+  `;
+  new bootstrap.Modal(document.getElementById("confirmModal")).show();
+}
+
+async function sendToGAS(data) {
+  bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
   const loading = new bootstrap.Modal(document.getElementById("loadingModal"));
   loading.show();
 
-  const formData = new FormData(form);
-  fetch("", {method:"POST", body:formData})
-    .then(res=>res.json())
-    .then(res=>{
-      loading.hide();
-      if(res.status==="success"){
-        const successHtml = `
-<div class="modal fade" id="successModal" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content shadow-lg rounded-4 border-0" style="background: linear-gradient(135deg,#e6ffed,#b8f0c7);">
-      <div class="modal-header border-0 justify-content-center py-2">
-        <h4 class="modal-title fw-bold text-success m-0">🎉 ส่งข้อมูลสำเร็จ</h4>
-      </div>
-      <div class="modal-body text-start py-2" style="line-height:1.4; word-wrap: break-word;">
-        <b>ลำดับเอกสาร:</b> ${res.number}<br>
-        <b>วันที่:</b> ${form.date.value}<br>
-        <b>เรื่อง:</b> ${form.title.value}<br>
-        <b>ผู้เสนอ:</b> ${form.owner.value}<br>
-        <b>หมายเหตุ:</b> ${form.note.value || "-"}<br>
-        <b>ไฟล์:</b> <a href="${res.pdfUrl}" target="_blank">${file.name}</a>
-      </div>
-      <div class="modal-footer flex-column border-0 py-2">
-        <button class="btn btn-success w-100 py-2" data-bs-dismiss="modal">✅ ตกลง</button>
-      </div>
-    </div>
-  </div>
-</div>`;
-        document.getElementById("modals").innerHTML = successHtml;
-        new bootstrap.Modal(document.getElementById("successModal")).show();
-        form.reset(); document.getElementById("pdfFile").value="";
-      } else alert("ผิดพลาด: "+res.message);
-    })
-    .catch(err=>{
-      loading.hide();
-      alert("ผิดพลาด: "+err.message);
+  try {
+    const formData = new FormData();
+    formData.append("date", data.date);
+    formData.append("title", data.title);
+    formData.append("owner", data.owner);
+    formData.append("note", data.note);
+    formData.append("pdf", data.file);
+
+    const response = await fetch(GAS_WEB_APP_URL, {
+      method: "POST",
+      body: formData
     });
+
+    const result = await response.json();
+    loading.hide();
+
+    if (result.status === "success") {
+      document.getElementById("successDetail").innerHTML = `
+        <b>วันที่:</b> ${data.date}<br>
+        <b>เรื่อง:</b> ${data.title}<br>
+        <b>ผู้เสนอ:</b> ${data.owner}<br>
+        <b>หมายเหตุ:</b> ${data.note || "-"}<br>
+        <b>ไฟล์:</b> <a href="${result.pdfUrl}" target="_blank">${data.file.name}</a>
+      `;
+      document.getElementById("formData").reset();
+      document.getElementById("pdfFile").value = "";
+      new bootstrap.Modal(document.getElementById("successModal")).show();
+    } else {
+      alert("ส่งข้อมูลล้มเหลว: " + result.message);
+    }
+
+  } catch (err) {
+    loading.hide();
+    alert("เกิดข้อผิดพลาด: " + err.message);
+  }
 }
