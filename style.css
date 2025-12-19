@@ -1,0 +1,5 @@
+body { font-family: 'K2D', sans-serif; background: #f0f4ff; }
+.form-card { border-radius: 12px; }
+.custom-btn { background:#0d6efd; color:white; font-size:18px; }
+form label { font-weight: 600; }
+.card-text b { font-weight: 500; }
