@@ -3,19 +3,13 @@ const MAX_FILE_SIZE_MB = 50;
 // ปุ่มถัดไป → เปิด modal ยืนยัน
 document.getElementById("btnNext").addEventListener("click", () => {
   const f = document.getElementById("formData");
-  if (!f.checkValidity()) { 
-    f.reportValidity(); 
-    return; 
-  }
+  if (!f.checkValidity()) { f.reportValidity(); return; }
 
   const file = document.getElementById("pdfFile").files[0];
-  if (!file) { 
-    alert("กรุณาเลือกไฟล์ PDF"); 
-    return; 
-  }
+  if (!file) { alert("กรุณาเลือกไฟล์ PDF"); return; }
 
   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) { 
-    alert(`ไฟล์มีขนาดเกิน ${MAX_FILE_SIZE_MB} MB กรุณาเลือกไฟล์ขนาดเล็กกว่า`); 
+    alert(`ไฟล์มีขนาดเกิน ${MAX_FILE_SIZE_MB} MB กรุณาเลือกไฟล์ขนาดเล็กกว่า`);
     return; 
   }
 
@@ -48,8 +42,7 @@ document.getElementById("btnSubmit").addEventListener("click", async () => {
   formData.append("pdf", file);
 
   try {
-    // ใส่ URL Web App ของ GAS ที่ Deploy แล้ว
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // เปลี่ยนเป็น URL Web App ของคุณ
     const res = await fetch(GAS_URL, { method: "POST", body: formData });
     const result = await res.json();
 
