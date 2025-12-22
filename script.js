@@ -1,5 +1,5 @@
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
-const MAX_FILE_SIZE_MB = 50;
+const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
 const btnNext = document.getElementById("btnNext");
@@ -7,7 +7,6 @@ const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
 btnNext.addEventListener("click", () => {
-
   if (!form.checkValidity()) {
     form.reportValidity();
     return;
@@ -16,7 +15,7 @@ btnNext.addEventListener("click", () => {
   const file = pdfFile.files[0];
   if (!file) return alert("กรุณาเลือกไฟล์ PDF");
   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024)
-    return alert("ไฟล์เกิน 50 MB");
+    return alert("ไฟล์เกิน 20 MB");
 
   document.getElementById("confirmText").innerHTML = `
     <b>วันที่:</b> ${form.date.value}<br>
@@ -26,46 +25,34 @@ btnNext.addEventListener("click", () => {
     <b>ไฟล์:</b> ${file.name}
   `;
 
-  new bootstrap.Modal(
-    document.getElementById("confirmModal")
-  ).show();
+  new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
-btnSubmit.addEventListener("click", () => {
-
-  const confirmInstance = bootstrap.Modal.getInstance(
+btnSubmit.addEventListener("click", async () => {
+  bootstrap.Modal.getInstance(
     document.getElementById("confirmModal")
-  );
-  confirmInstance.hide();
+  ).hide();
 
   const loadingModal = new bootstrap.Modal(
     document.getElementById("loadingModal")
   );
   loadingModal.show();
 
-  const reader = new FileReader();
-  reader.onload = async () => {
+  const fd = new FormData();
+  fd.append("date", form.date.value);
+  fd.append("subject", form.subject.value);
+  fd.append("owner", form.owner.value);
+  fd.append("note", form.note.value);
+  fd.append("pdf", pdfFile.files[0]);
 
-    const base64 = btoa(
-      String.fromCharCode(...new Uint8Array(reader.result))
-    );
+  try {
+    const res = await fetch(GAS_URL, {
+      method: "POST",
+      body: fd
+    });
 
-    const fd = new FormData();
-    fd.append("data", JSON.stringify({
-      date: form.date.value,
-      subject: form.subject.value,
-      owner: form.owner.value,
-      note: form.note.value
-    }));
-    fd.append("pdf", base64);
-    fd.append("filename", pdfFile.files[0].name);
-
-    const res = await fetch(GAS_URL, { method: "POST", body: fd });
     const r = await res.json();
-
-    bootstrap.Modal.getInstance(
-      document.getElementById("loadingModal")
-    ).hide();
+    loadingModal.hide();
 
     if (r.status === "success") {
       document.getElementById("successDetail").innerHTML = `
@@ -74,14 +61,15 @@ btnSubmit.addEventListener("click", () => {
       `;
       document.getElementById("qrCodeImg").src = r.qrCodeUrl;
       form.reset();
-
       new bootstrap.Modal(
         document.getElementById("successModal")
       ).show();
     } else {
       alert(r.message);
     }
-  };
-
-  reader.readAsArrayBuffer(pdfFile.files[0]);
+  } catch (err) {
+    loadingModal.hide();
+    alert("ส่งข้อมูลไม่สำเร็จ");
+    console.error(err);
+  }
 });
