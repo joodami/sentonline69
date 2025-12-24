@@ -29,43 +29,45 @@ btnNext.addEventListener("click", () => {
 });
 
 btnSubmit.addEventListener("click", async () => {
-  bootstrap.Modal.getInstance(
-    document.getElementById("confirmModal")
-  ).hide();
+  bootstrap.Modal
+    .getInstance(document.getElementById("confirmModal"))
+    .hide();
 
   const loadingModal = new bootstrap.Modal(
     document.getElementById("loadingModal")
   );
   loadingModal.show();
 
-  const file = pdfFile.files[0];
-
-  // แปลงไฟล์เป็น Base64
-  const base64 = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-
-  const payload = {
-    date: form.date.value,
-    subject: form.subject.value,
-    owner: form.owner.value,
-    note: form.note.value,
-    filename: file.name,
-    mimeType: file.type,
-    fileBase64: base64
-  };
-
   try {
+    const file = pdfFile.files[0];
+
+    // แปลงไฟล์เป็น Base64
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const payload = {
+      date: form.date.value,
+      subject: form.subject.value,
+      owner: form.owner.value,
+      note: form.note.value,
+      filename: file.name,
+      mimeType: file.type,
+      fileBase64: base64
+    };
+
+    // ❗❗ สำคัญ: ห้ามใส่ headers
     const res = await fetch(GAS_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
-    const r = await res.json();
+    const text = await res.text(); // ปลอดภัยกว่า json()
+    const r = JSON.parse(text);
+
     loadingModal.hide();
 
     if (r.status === "success") {
@@ -81,6 +83,7 @@ btnSubmit.addEventListener("click", async () => {
     } else {
       alert(r.message);
     }
+
   } catch (err) {
     loadingModal.hide();
     alert("ส่งข้อมูลไม่สำเร็จ");
