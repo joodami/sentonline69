@@ -6,23 +6,12 @@ const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
-/* ===== ปุ่มถัดไป (ตรวจข้อมูล + เปิด modal ยืนยัน) ===== */
 btnNext.addEventListener("click", () => {
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return;
-  }
+  if (!form.checkValidity()) { form.reportValidity(); return; }
 
   const file = pdfFile.files[0];
-  if (!file) {
-    alert("กรุณาเลือกไฟล์ PDF");
-    return;
-  }
-
-  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-    alert("ไฟล์เกิน 20 MB");
-    return;
-  }
+  if (!file) return alert("กรุณาเลือกไฟล์ PDF");
+  if (file.size > MAX_FILE_SIZE_MB*1024*1024) return alert("ไฟล์เกิน 20 MB");
 
   document.getElementById("confirmText").innerHTML = `
     <b>วันที่:</b> ${form.date.value}<br>
@@ -31,14 +20,11 @@ btnNext.addEventListener("click", () => {
     <b>หมายเหตุ:</b> ${form.note.value || "-"}<br>
     <b>ไฟล์:</b> ${file.name}
   `;
-
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
-/* ===== ปุ่มยืนยันส่งข้อมูล ===== */
 btnSubmit.addEventListener("click", async () => {
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
-
   const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
   loadingModal.show();
 
@@ -50,12 +36,8 @@ btnSubmit.addEventListener("click", async () => {
     fd.append("note", form.note.value);
     fd.append("pdf", pdfFile.files[0]);
 
-    const res = await fetch(GAS_URL, {
-      method: "POST",
-      body: fd
-    });
-
-    const r = await res.json(); // GAS จะคืน JSON
+    const res = await fetch(GAS_URL, { method:"POST", body:fd });
+    const r = await res.json();
 
     loadingModal.hide();
 
@@ -70,8 +52,7 @@ btnSubmit.addEventListener("click", async () => {
     } else {
       alert(r.message);
     }
-
-  } catch (err) {
+  } catch(err) {
     loadingModal.hide();
     alert("ส่งข้อมูลไม่สำเร็จ");
     console.error(err);
