@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // เปลี่ยนเป็น URL ของคุณ
 const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
@@ -29,16 +29,33 @@ btnSubmit.addEventListener("click", async () => {
   loadingModal.show();
 
   try {
-    const fd = new FormData();
-    fd.append("date", form.date.value);
-    fd.append("subject", form.subject.value);
-    fd.append("owner", form.owner.value);
-    fd.append("note", form.note.value);
-    fd.append("pdf", pdfFile.files[0]);
+    const file = pdfFile.files[0];
 
-    const res = await fetch(GAS_URL, { method:"POST", body:fd });
+    // แปลงเป็น Base64
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const payload = {
+      date: form.date.value,
+      subject: form.subject.value,
+      owner: form.owner.value,
+      note: form.note.value,
+      filename: file.name,
+      mimeType: file.type,
+      fileBase64: base64
+    };
+
+    const res = await fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" }
+    });
+
     const r = await res.json();
-
     loadingModal.hide();
 
     if (r.status === "success") {
@@ -52,6 +69,7 @@ btnSubmit.addEventListener("click", async () => {
     } else {
       alert(r.message);
     }
+
   } catch(err) {
     loadingModal.hide();
     alert("ส่งข้อมูลไม่สำเร็จ");
