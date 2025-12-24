@@ -6,12 +6,16 @@ const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
+// ปุ่ม Next ตรวจสอบฟอร์มและแสดง Modal Confirm
 btnNext.addEventListener("click", () => {
-  if (!form.checkValidity()) { form.reportValidity(); return; }
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
 
   const file = pdfFile.files[0];
   if (!file) return alert("กรุณาเลือกไฟล์ PDF");
-  if (file.size > MAX_FILE_SIZE_MB*1024*1024) return alert("ไฟล์เกิน 20 MB");
+  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert("ไฟล์เกิน 20 MB");
 
   document.getElementById("confirmText").innerHTML = `
     <b>วันที่:</b> ${form.date.value}<br>
@@ -23,6 +27,7 @@ btnNext.addEventListener("click", () => {
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
+// ปุ่ม Submit ส่งข้อมูลไป GAS
 btnSubmit.addEventListener("click", async () => {
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
   const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
@@ -31,7 +36,7 @@ btnSubmit.addEventListener("click", async () => {
   try {
     const file = pdfFile.files[0];
 
-    // แปลงเป็น Base64
+    // แปลงไฟล์เป็น Base64
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result.split(",")[1]);
@@ -39,6 +44,7 @@ btnSubmit.addEventListener("click", async () => {
       reader.readAsDataURL(file);
     });
 
+    // สร้าง payload JSON
     const payload = {
       date: form.date.value,
       subject: form.subject.value,
@@ -49,10 +55,10 @@ btnSubmit.addEventListener("click", async () => {
       fileBase64: base64
     };
 
+    // ส่งไป GAS (ไม่ใส่ headers)
     const res = await fetch(GAS_URL, {
       method: "POST",
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" }
+      body: JSON.stringify(payload)
     });
 
     const r = await res.json();
@@ -69,8 +75,7 @@ btnSubmit.addEventListener("click", async () => {
     } else {
       alert(r.message);
     }
-
-  } catch(err) {
+  } catch (err) {
     loadingModal.hide();
     alert("ส่งข้อมูลไม่สำเร็จ");
     console.error(err);
