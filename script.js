@@ -1,6 +1,4 @@
-const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
-
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
@@ -34,26 +32,17 @@ btnNext.addEventListener("click", () => {
     <b>ไฟล์:</b> ${file.name}
   `;
 
-  new bootstrap.Modal(
-    document.getElementById("confirmModal")
-  ).show();
+  new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
 /* ===== ปุ่มยืนยันส่งข้อมูล ===== */
 btnSubmit.addEventListener("click", async () => {
-  // ปิด modal ยืนยัน
-  bootstrap.Modal
-    .getInstance(document.getElementById("confirmModal"))
-    .hide();
+  bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
 
-  // เปิด loading
-  const loadingModal = new bootstrap.Modal(
-    document.getElementById("loadingModal")
-  );
+  const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
   loadingModal.show();
 
   try {
-    // สร้าง FormData
     const fd = new FormData();
     fd.append("date", form.date.value);
     fd.append("subject", form.subject.value);
@@ -61,22 +50,26 @@ btnSubmit.addEventListener("click", async () => {
     fd.append("note", form.note.value);
     fd.append("pdf", pdfFile.files[0]);
 
-    // ส่งไปที่ Google Apps Script
-    await fetch(GAS_URL, {
+    const res = await fetch(GAS_URL, {
       method: "POST",
       body: fd
     });
 
-    // ปิด loading
+    const r = await res.json(); // GAS จะคืน JSON
+
     loadingModal.hide();
 
-    // รีเซ็ตฟอร์ม
-    form.reset();
-
-    // เปิด modal สำเร็จ
-    new bootstrap.Modal(
-      document.getElementById("successModal")
-    ).show();
+    if (r.status === "success") {
+      document.getElementById("successDetail").innerHTML = `
+        <b>เลขที่เอกสาร:</b> ${r.number}<br>
+        <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
+      `;
+      document.getElementById("qrCodeImg").src = r.qrCodeUrl;
+      form.reset();
+      new bootstrap.Modal(document.getElementById("successModal")).show();
+    } else {
+      alert(r.message);
+    }
 
   } catch (err) {
     loadingModal.hide();
