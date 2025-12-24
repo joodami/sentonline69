@@ -1,4 +1,6 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
+const GAS_URL =
+  "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
+
 const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
@@ -6,6 +8,7 @@ const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
+/* ===== ปุ่มถัดไป (ตรวจข้อมูล + เปิด modal ยืนยัน) ===== */
 btnNext.addEventListener("click", () => {
   if (!form.checkValidity()) {
     form.reportValidity();
@@ -13,9 +16,15 @@ btnNext.addEventListener("click", () => {
   }
 
   const file = pdfFile.files[0];
-  if (!file) return alert("กรุณาเลือกไฟล์ PDF");
-  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024)
-    return alert("ไฟล์เกิน 20 MB");
+  if (!file) {
+    alert("กรุณาเลือกไฟล์ PDF");
+    return;
+  }
+
+  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+    alert("ไฟล์เกิน 20 MB");
+    return;
+  }
 
   document.getElementById("confirmText").innerHTML = `
     <b>วันที่:</b> ${form.date.value}<br>
@@ -25,64 +34,49 @@ btnNext.addEventListener("click", () => {
     <b>ไฟล์:</b> ${file.name}
   `;
 
-  new bootstrap.Modal(document.getElementById("confirmModal")).show();
+  new bootstrap.Modal(
+    document.getElementById("confirmModal")
+  ).show();
 });
 
+/* ===== ปุ่มยืนยันส่งข้อมูล ===== */
 btnSubmit.addEventListener("click", async () => {
+  // ปิด modal ยืนยัน
   bootstrap.Modal
     .getInstance(document.getElementById("confirmModal"))
     .hide();
 
+  // เปิด loading
   const loadingModal = new bootstrap.Modal(
     document.getElementById("loadingModal")
   );
   loadingModal.show();
 
   try {
-    const file = pdfFile.files[0];
+    // สร้าง FormData
+    const fd = new FormData();
+    fd.append("date", form.date.value);
+    fd.append("subject", form.subject.value);
+    fd.append("owner", form.owner.value);
+    fd.append("note", form.note.value);
+    fd.append("pdf", pdfFile.files[0]);
 
-    // แปลงไฟล์เป็น Base64
-    const base64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
-    const payload = {
-      date: form.date.value,
-      subject: form.subject.value,
-      owner: form.owner.value,
-      note: form.note.value,
-      filename: file.name,
-      mimeType: file.type,
-      fileBase64: base64
-    };
-
-    // ❗❗ สำคัญ: ห้ามใส่ headers
-    const res = await fetch(GAS_URL, {
+    // ส่งไปที่ Google Apps Script
+    await fetch(GAS_URL, {
       method: "POST",
-      body: JSON.stringify(payload)
+      body: fd
     });
 
-    const text = await res.text(); // ปลอดภัยกว่า json()
-    const r = JSON.parse(text);
-
+    // ปิด loading
     loadingModal.hide();
 
-    if (r.status === "success") {
-      document.getElementById("successDetail").innerHTML = `
-        <b>เลขที่เอกสาร:</b> ${r.number}<br>
-        <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
-      `;
-      document.getElementById("qrCodeImg").src = r.qrCodeUrl;
-      form.reset();
-      new bootstrap.Modal(
-        document.getElementById("successModal")
-      ).show();
-    } else {
-      alert(r.message);
-    }
+    // รีเซ็ตฟอร์ม
+    form.reset();
+
+    // เปิด modal สำเร็จ
+    new bootstrap.Modal(
+      document.getElementById("successModal")
+    ).show();
 
   } catch (err) {
     loadingModal.hide();
