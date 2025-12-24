@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // ใส่ URL ใหม่ที่ deploy
 const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
@@ -6,11 +6,12 @@ const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
+// Next
 btnNext.addEventListener("click", () => {
   if (!form.checkValidity()) { form.reportValidity(); return; }
   const file = pdfFile.files[0];
   if (!file) return alert("กรุณาเลือกไฟล์ PDF");
-  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert("ไฟล์เกิน 20 MB");
+  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert(`ไฟล์เกิน ${MAX_FILE_SIZE_MB} MB`);
 
   document.getElementById("confirmText").innerHTML = `
     <b>วันที่:</b> ${form.date.value}<br>
@@ -22,6 +23,7 @@ btnNext.addEventListener("click", () => {
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
+// Submit
 btnSubmit.addEventListener("click", async () => {
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
   const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
@@ -52,12 +54,14 @@ btnSubmit.addEventListener("click", async () => {
       headers: { "Content-Type": "application/json" }
     });
 
+    const resText = await res.text();
     let r;
-    try { r = await res.json(); }
-    catch(err) {
+    try {
+      r = JSON.parse(resText);
+    } catch(err) {
       loadingModal.hide();
       alert("ไม่สามารถ parse response จาก server");
-      console.error(await res.text());
+      console.error(resText);
       return;
     }
 
@@ -79,11 +83,13 @@ btnSubmit.addEventListener("click", async () => {
       downloadLink.download = `QR_${r.number}.png`;
       form.reset();
       new bootstrap.Modal(document.getElementById("successModal")).show();
-    } else alert(r.message);
+    } else {
+      alert(r.message);
+    }
 
   } catch (err) {
     loadingModal.hide();
-    alert("ส่งข้อมูลไม่สำเร็จ");
+    alert("ส่งข้อมูลไม่สำเร็จ: " + err.message);
     console.error(err);
   }
 });
