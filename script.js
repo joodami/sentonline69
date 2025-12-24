@@ -1,5 +1,5 @@
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
-const MAX_FILE_SIZE_MB = 50; // รองรับ PDF 50MB
+const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
 const btnNext = document.getElementById("btnNext");
@@ -11,7 +11,7 @@ btnNext.addEventListener("click", () => {
   if (!form.checkValidity()) { form.reportValidity(); return; }
   const file = pdfFile.files[0];
   if (!file) return alert("กรุณาเลือกไฟล์ PDF");
-  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert(`ไฟล์เกิน ${MAX_FILE_SIZE_MB} MB`);
+  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert("ไฟล์เกิน 20 MB");
 
   document.getElementById("confirmText").innerHTML = `
     <b>วันที่:</b> ${form.date.value}<br>
