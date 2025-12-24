@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // เปลี่ยนเป็น URL ของคุณ
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
@@ -6,13 +6,9 @@ const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
-// ปุ่ม Next ตรวจสอบฟอร์มและแสดง Modal Confirm
+// Next
 btnNext.addEventListener("click", () => {
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return;
-  }
-
+  if (!form.checkValidity()) { form.reportValidity(); return; }
   const file = pdfFile.files[0];
   if (!file) return alert("กรุณาเลือกไฟล์ PDF");
   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert("ไฟล์เกิน 20 MB");
@@ -27,7 +23,7 @@ btnNext.addEventListener("click", () => {
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
-// ปุ่ม Submit ส่งข้อมูลไป GAS
+// Submit
 btnSubmit.addEventListener("click", async () => {
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
   const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
@@ -35,8 +31,6 @@ btnSubmit.addEventListener("click", async () => {
 
   try {
     const file = pdfFile.files[0];
-
-    // แปลงไฟล์เป็น Base64
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result.split(",")[1]);
@@ -44,7 +38,6 @@ btnSubmit.addEventListener("click", async () => {
       reader.readAsDataURL(file);
     });
 
-    // สร้าง payload JSON
     const payload = {
       date: form.date.value,
       subject: form.subject.value,
@@ -55,10 +48,10 @@ btnSubmit.addEventListener("click", async () => {
       fileBase64: base64
     };
 
-    // ส่งไป GAS (ไม่ใส่ headers)
     const res = await fetch(GAS_URL, {
       method: "POST",
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" }
     });
 
     const r = await res.json();
@@ -67,9 +60,17 @@ btnSubmit.addEventListener("click", async () => {
     if (r.status === "success") {
       document.getElementById("successDetail").innerHTML = `
         <b>เลขที่เอกสาร:</b> ${r.number}<br>
+        <b>วันที่:</b> ${r.date}<br>
+        <b>เรื่อง:</b> ${r.subject}<br>
+        <b>ผู้เสนอ:</b> ${r.owner}<br>
+        <b>หมายเหตุ:</b> ${r.note || "-"}<br>
         <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
       `;
-      document.getElementById("qrCodeImg").src = r.qrCodeUrl;
+      const qrImg = document.getElementById("qrCodeImg");
+      qrImg.src = r.qrCodeUrl;
+      const downloadLink = document.getElementById("downloadQR");
+      downloadLink.href = r.qrCodeUrl;
+      downloadLink.download = `QR_${r.number}.png`;
       form.reset();
       new bootstrap.Modal(document.getElementById("successModal")).show();
     } else {
