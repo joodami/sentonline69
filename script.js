@@ -38,17 +38,31 @@ btnSubmit.addEventListener("click", async () => {
   );
   loadingModal.show();
 
-  const fd = new FormData();
-  fd.append("date", form.date.value);
-  fd.append("subject", form.subject.value);
-  fd.append("owner", form.owner.value);
-  fd.append("note", form.note.value);
-  fd.append("pdf", pdfFile.files[0]);
+  const file = pdfFile.files[0];
+
+  // แปลงไฟล์เป็น Base64
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  const payload = {
+    date: form.date.value,
+    subject: form.subject.value,
+    owner: form.owner.value,
+    note: form.note.value,
+    filename: file.name,
+    mimeType: file.type,
+    fileBase64: base64
+  };
 
   try {
     const res = await fetch(GAS_URL, {
       method: "POST",
-      body: fd
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
 
     const r = await res.json();
