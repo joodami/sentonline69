@@ -1,6 +1,12 @@
+// ---------------------------
+// Config
+// ---------------------------
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // ใส่ URL ใหม่ที่ deploy
 const MAX_FILE_SIZE_MB = 20;
 
+// ---------------------------
+// Elements
+// ---------------------------
 const form = document.getElementById("formData");
 const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
@@ -10,7 +16,11 @@ const pdfFile = document.getElementById("pdfFile");
 // Next: แสดง Modal ยืนยัน
 // ---------------------------
 btnNext.addEventListener("click", () => {
-  if (!form.checkValidity()) { form.reportValidity(); return; }
+  if (!form.checkValidity()) { 
+    form.reportValidity(); 
+    return; 
+  }
+
   const file = pdfFile.files[0];
   if (!file) return alert("กรุณาเลือกไฟล์ PDF");
   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert(`ไฟล์เกิน ${MAX_FILE_SIZE_MB} MB`);
@@ -35,6 +45,7 @@ btnSubmit.addEventListener("click", async () => {
 
   try {
     const file = pdfFile.files[0];
+
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result.split(",")[1]);
@@ -52,18 +63,11 @@ btnSubmit.addEventListener("click", async () => {
       fileBase64: base64
     };
 
-await fetch(GAS_URL, {
-  method: "POST",
-  mode: "no-cors",
-  body: JSON.stringify(payload)
-});
-
-// ถือว่าสำเร็จ
-loadingModal.hide();
-form.reset();
-new bootstrap.Modal(document.getElementById("successModal")).show();
-
-
+    const res = await fetch(GAS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
     const resText = await res.text();
     let r;
