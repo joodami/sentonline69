@@ -81,20 +81,18 @@ btnSubmit.addEventListener("click", async () => {
       `;
 
       // ---------------------------
-      // แสดง QR Code
+      // แสดง QR Code จาก Drive
       // ---------------------------
       const qrImg = document.getElementById("qrCodeImg");
       qrImg.src = r.qrUrl;
 
       // ---------------------------
-      // ดาวน์โหลด QR Code ทันที
+      // ดาวน์โหลด QR Code ทันทีจาก Drive
       // ---------------------------
       const downloadLink = document.getElementById("downloadQR");
-
       downloadLink.href = r.qrUrl;
       downloadLink.setAttribute("download", `QR_${r.number}.png`);
 
-      // สำหรับมือถือและ PC: fetch + blob
       downloadLink.addEventListener("click", async (e) => {
         e.preventDefault();
         const resp = await fetch(r.qrUrl);
