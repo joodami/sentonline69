@@ -88,8 +88,9 @@ btnSubmit.addEventListener("click", async () => {
 
       // ตั้งค่าลิงก์ดาวน์โหลด QR
       const downloadLink = document.getElementById("downloadQR");
-      downloadLink.href = r.qrDownloadUrl;
+      downloadLink.href = r.qrCodeUrl; // ใช้ URL ของ QR Code จริง
       downloadLink.setAttribute("download", `QR_${r.number}.png`);
+
 
       form.reset();
       new bootstrap.Modal(document.getElementById("successModal")).show();
