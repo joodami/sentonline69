@@ -6,7 +6,9 @@ const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
-// Next
+// ---------------------------
+// Next: แสดง Modal ยืนยัน
+// ---------------------------
 btnNext.addEventListener("click", () => {
   if (!form.checkValidity()) { form.reportValidity(); return; }
   const file = pdfFile.files[0];
@@ -23,7 +25,9 @@ btnNext.addEventListener("click", () => {
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
-// Submit
+// ---------------------------
+// Submit: ส่งข้อมูล
+// ---------------------------
 btnSubmit.addEventListener("click", async () => {
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
   const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
@@ -47,22 +51,16 @@ btnSubmit.addEventListener("click", async () => {
       mimeType: file.type,
       fileBase64: base64
     };
-const res = await fetch(GAS_URL, {
-  method: "POST",
-  body: JSON.stringify(payload)
-});
 
+    const res = await fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
 
     const resText = await res.text();
     let r;
-    try {
-      r = JSON.parse(resText);
-    } catch(err) {
-      loadingModal.hide();
-      alert("ไม่สามารถ parse response จาก server");
-      console.error(resText);
-      return;
-    }
+    try { r = JSON.parse(resText); } 
+    catch(err) { loadingModal.hide(); alert("ไม่สามารถ parse response จาก server"); console.error(resText); return; }
 
     loadingModal.hide();
 
@@ -75,12 +73,13 @@ const res = await fetch(GAS_URL, {
         <b>หมายเหตุ:</b> ${r.note || "-"}<br>
         <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
       `;
-      const qrImg = document.getElementById("qrCodeImg");
-     qrImg.src = r.qrCodeUrl;
 
-const downloadLink = document.getElementById("downloadQR");
-downloadLink.href = r.qrDownloadUrl;
-downloadLink.setAttribute("download", `QR_${r.number}.png`);
+      const qrImg = document.getElementById("qrCodeImg");
+      qrImg.src = r.qrCodeUrl;
+
+      const downloadLink = document.getElementById("downloadQR");
+      downloadLink.href = r.qrDownloadUrl;
+      downloadLink.setAttribute("download", `QR_${r.number}.png`);
 
       form.reset();
       new bootstrap.Modal(document.getElementById("successModal")).show();
