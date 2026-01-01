@@ -59,8 +59,14 @@ btnSubmit.addEventListener("click", async () => {
 
     const resText = await res.text();
     let r;
-    try { r = JSON.parse(resText); } 
-    catch(err) { loadingModal.hide(); alert("ไม่สามารถ parse response จาก server"); console.error(resText); return; }
+    try { 
+      r = JSON.parse(resText); 
+    } catch(err) { 
+      loadingModal.hide(); 
+      alert("ไม่สามารถ parse response จาก server"); 
+      console.error(resText); 
+      return; 
+    }
 
     loadingModal.hide();
 
@@ -74,9 +80,13 @@ btnSubmit.addEventListener("click", async () => {
         <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
       `;
 
+      // ---------------------------
+      // แสดง QR Code จาก URL ที่ server ส่งกลับ
+      // ---------------------------
       const qrImg = document.getElementById("qrCodeImg");
       qrImg.src = r.qrCodeUrl;
 
+      // ตั้งค่าลิงก์ดาวน์โหลด QR
       const downloadLink = document.getElementById("downloadQR");
       downloadLink.href = r.qrDownloadUrl;
       downloadLink.setAttribute("download", `QR_${r.number}.png`);
