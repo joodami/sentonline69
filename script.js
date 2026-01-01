@@ -48,11 +48,11 @@ btnSubmit.addEventListener("click", async () => {
       fileBase64: base64
     };
 
-    const res = await fetch(GAS_URL, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" }
-    });
+const res = await fetch(GAS_URL, {
+  method: "POST",
+  body: JSON.stringify(payload)
+});
+
 
     const resText = await res.text();
     let r;
