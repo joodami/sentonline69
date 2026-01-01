@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // ใส่ URL ใหม่ที่ deploy
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
@@ -59,14 +59,8 @@ btnSubmit.addEventListener("click", async () => {
 
     const resText = await res.text();
     let r;
-    try { 
-      r = JSON.parse(resText); 
-    } catch(err) { 
-      loadingModal.hide(); 
-      alert("ไม่สามารถ parse response จาก server"); 
-      console.error(resText); 
-      return; 
-    }
+    try { r = JSON.parse(resText); } 
+    catch(err) { loadingModal.hide(); alert("ไม่สามารถ parse response จาก server"); console.error(resText); return; }
 
     loadingModal.hide();
 
@@ -80,17 +74,24 @@ btnSubmit.addEventListener("click", async () => {
         <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
       `;
 
-      // ---------------------------
-      // แสดง QR Code จาก URL ที่ server ส่งกลับ
-      // ---------------------------
       const qrImg = document.getElementById("qrCodeImg");
       qrImg.src = r.qrCodeUrl;
 
-      // ตั้งค่าลิงก์ดาวน์โหลด QR
       const downloadLink = document.getElementById("downloadQR");
-      downloadLink.href = r.qrCodeUrl; // ใช้ URL ของ QR Code จริง
-      downloadLink.setAttribute("download", `QR_${r.number}.png`);
-
+      downloadLink.replaceWith(downloadLink.cloneNode(true)); 
+      const newDownloadLink = document.getElementById("downloadQR");
+      newDownloadLink.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const qrRes = await fetch(r.qrCodeUrl);
+        const blob = await qrRes.blob();
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `QR_${r.number}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(a.href);
+      });
 
       form.reset();
       new bootstrap.Modal(document.getElementById("successModal")).show();
