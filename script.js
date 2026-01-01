@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // ใส่ URL ใหม่ที่ deploy
 const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
@@ -59,8 +59,14 @@ btnSubmit.addEventListener("click", async () => {
 
     const resText = await res.text();
     let r;
-    try { r = JSON.parse(resText); } 
-    catch(err) { loadingModal.hide(); alert("ไม่สามารถ parse response จาก server"); console.error(resText); return; }
+    try { 
+      r = JSON.parse(resText); 
+    } catch(err) { 
+      loadingModal.hide(); 
+      alert("ไม่สามารถ parse response จาก server"); 
+      console.error(resText); 
+      return; 
+    }
 
     loadingModal.hide();
 
@@ -74,23 +80,33 @@ btnSubmit.addEventListener("click", async () => {
         <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
       `;
 
+      // ---------------------------
+      // แสดง QR Code
+      // ---------------------------
       const qrImg = document.getElementById("qrCodeImg");
-      qrImg.src = r.qrCodeUrl;
+      qrImg.src = r.qrUrl;
 
+      // ---------------------------
+      // ดาวน์โหลด QR Code ทันที
+      // ---------------------------
       const downloadLink = document.getElementById("downloadQR");
-      downloadLink.replaceWith(downloadLink.cloneNode(true)); 
-      const newDownloadLink = document.getElementById("downloadQR");
-      newDownloadLink.addEventListener("click", async (e) => {
+
+      downloadLink.href = r.qrUrl;
+      downloadLink.setAttribute("download", `QR_${r.number}.png`);
+
+      // สำหรับมือถือและ PC: fetch + blob
+      downloadLink.addEventListener("click", async (e) => {
         e.preventDefault();
-        const qrRes = await fetch(r.qrCodeUrl);
-        const blob = await qrRes.blob();
+        const resp = await fetch(r.qrUrl);
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
+        a.href = url;
         a.download = `QR_${r.number}.png`;
         document.body.appendChild(a);
         a.click();
         a.remove();
-        URL.revokeObjectURL(a.href);
+        URL.revokeObjectURL(url);
       });
 
       form.reset();
