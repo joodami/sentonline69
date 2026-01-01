@@ -47,7 +47,6 @@ btnSubmit.addEventListener("click", async () => {
       mimeType: file.type,
       fileBase64: base64
     };
-
 const res = await fetch(GAS_URL, {
   method: "POST",
   body: JSON.stringify(payload)
