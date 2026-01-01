@@ -76,10 +76,12 @@ const res = await fetch(GAS_URL, {
         <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
       `;
       const qrImg = document.getElementById("qrCodeImg");
-      qrImg.src = r.qrCodeUrl;
-      const downloadLink = document.getElementById("downloadQR");
-      downloadLink.href = r.qrCodeUrl;
-      downloadLink.download = `QR_${r.number}.png`;
+     qrImg.src = r.qrCodeUrl;
+
+const downloadLink = document.getElementById("downloadQR");
+downloadLink.href = r.qrDownloadUrl;
+downloadLink.setAttribute("download", `QR_${r.number}.png`);
+
       form.reset();
       new bootstrap.Modal(document.getElementById("successModal")).show();
     } else {
