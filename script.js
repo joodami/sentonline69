@@ -58,6 +58,12 @@ await fetch(GAS_URL, {
   body: JSON.stringify(payload)
 });
 
+// ถือว่าสำเร็จ
+loadingModal.hide();
+form.reset();
+new bootstrap.Modal(document.getElementById("successModal")).show();
+
+
 
     const resText = await res.text();
     let r;
