@@ -1,7 +1,7 @@
 // ---------------------------
 // Config
 // ---------------------------
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // เปลี่ยนเป็น URL ของคุณ
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // ✅ แทนด้วย URL Deployment จริงของคุณ
 const MAX_FILE_SIZE_MB = 20;
 
 // ---------------------------
@@ -32,7 +32,7 @@ btnNext.addEventListener("click", () => {
     <b>หมายเหตุ:</b> ${form.note.value || "-"}<br>
     <b>ไฟล์:</b> ${file.name}
   `;
-  
+
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
