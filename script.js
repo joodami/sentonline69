@@ -1,7 +1,7 @@
 // ---------------------------
 // Config
 // ---------------------------
-const GAS_URL = "https://script.google.com/macros/s/YOUR_DEPLOY_URL_HERE/exec"; // เปลี่ยนเป็น URL ของคุณ
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // เปลี่ยนเป็น URL ของคุณ
 const MAX_FILE_SIZE_MB = 20;
 
 // ---------------------------
