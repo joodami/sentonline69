@@ -1,30 +1,7 @@
-body {
-  font-family: 'K2D', sans-serif;
-  background: #f0f4ff;
-}
-
-.form-card {
-  border-radius: 14px;
-}
-
-.custom-btn {
-  background: #0d6efd;
-  color: #fff;
-  font-size: 1.1rem;
-}
-
-label {
-  font-weight: 600;
-}
-
-.modal-gradient-blue {
-  background: linear-gradient(135deg,#f0f8ff,#d0e7ff);
-}
-
-.modal-gradient-lightblue {
-  background: linear-gradient(135deg,#e0f7ff,#b0e0ff);
-}
-
-.modal-gradient-green {
-  background: linear-gradient(135deg,#e6ffed,#b8f0c7);
-}
+body { font-family: 'K2D', sans-serif; background: #f0f4ff; }
+.form-card { border-radius: 14px; }
+.custom-btn { background: #0d6efd; color: #fff; font-size: 1.1rem; }
+label { font-weight: 600; }
+.modal-gradient-blue { background: linear-gradient(135deg,#f0f8ff,#d0e7ff); }
+.modal-gradient-lightblue { background: linear-gradient(135deg,#e0f7ff,#b0e0ff); }
+.modal-gradient-green { background: linear-gradient(135deg,#e6ffed,#b8f0c7); }
