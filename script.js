@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/YOUR_GAS_DEPLOY_ID/exec"; // URL ของคุณ
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // URL ของคุณ
 const MAX_FILE_SIZE_MB = 50;
 
 const form = document.getElementById("formData");
