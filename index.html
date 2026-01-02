@@ -15,19 +15,35 @@
        class="img-fluid rounded shadow mb-4 w-100">
   <div class="card shadow form-card p-4 mb-4">
     <h3 class="text-center mb-4 fw-bold text-primary">ระบบเสนอเซ็นออนไลน์</h3>
-    <form id="formData" novalidate>
-      <label>วันที่</label>
-      <input type="date" name="date" class="form-control mb-3" required>
-      <label>เรื่อง</label>
-      <textarea name="subject" class="form-control mb-3" rows="1" required></textarea>
-      <label>ผู้เสนอ</label>
-      <input type="text" name="owner" class="form-control mb-3" required>
-      <label>หมายเหตุ</label>
-      <textarea name="note" class="form-control mb-3" rows="2"></textarea>
-      <label>อัปโหลดไฟล์ PDF</label>
-      <input type="file" id="pdfFile" accept="application/pdf" class="form-control mb-4" required>
-      <button type="button" id="btnNext" class="btn custom-btn w-100 py-2">ถัดไป</button>
-    </form>
+    <form id="formData"
+      action="https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"
+      method="post"
+      enctype="multipart/form-data"
+      target="hidden_iframe"
+      novalidate>
+
+  <label>วันที่</label>
+  <input type="date" name="date" class="form-control mb-3" required>
+
+  <label>เรื่อง</label>
+  <textarea name="subject" class="form-control mb-3" rows="1" required></textarea>
+
+  <label>ผู้เสนอ</label>
+  <input type="text" name="owner" class="form-control mb-3" required>
+
+  <label>หมายเหตุ</label>
+  <textarea name="note" class="form-control mb-3" rows="2"></textarea>
+
+  <label>อัปโหลดไฟล์ PDF</label>
+  <input type="file" name="pdfFile" accept="application/pdf" class="form-control mb-4" required>
+
+  <button type="button" id="btnNext" class="btn custom-btn w-100 py-2">
+    ถัดไป
+  </button>
+</form>
+
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+
   </div>
   <div class="text-center text-secondary small mb-4">
     © 2569 งานสารบรรณโรงเรียน สำนักงานอำนวยการ
