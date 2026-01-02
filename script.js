@@ -1,4 +1,4 @@
-const GAS_URL = "YOUR_GAS_URL_HERE"; // URL จาก Deploy Web App
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // URL จาก Deploy Web App
 const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
