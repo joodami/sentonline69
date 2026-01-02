@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // URL จาก Deploy Web App
+const GAS_URL = "YOUR_DEPLOY_WEBAPP_URL_HERE"; // เปลี่ยนเป็น URL ของคุณ
 const MAX_FILE_SIZE_MB = 20;
 
 const form = document.getElementById("formData");
@@ -6,7 +6,7 @@ const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
-// Next
+// แสดง modal ยืนยัน
 btnNext.addEventListener("click", () => {
   if (!form.checkValidity()) { form.reportValidity(); return; }
   const file = pdfFile.files[0];
@@ -23,7 +23,7 @@ btnNext.addEventListener("click", () => {
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
-// Submit
+// ส่งข้อมูลไป GAS (FormData POST)
 btnSubmit.addEventListener("click", async () => {
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
   const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
@@ -31,30 +31,16 @@ btnSubmit.addEventListener("click", async () => {
 
   try {
     const file = pdfFile.files[0];
-    const base64 = await new Promise((resolve,reject)=>{
-      const reader = new FileReader();
-      reader.onload = ()=>resolve(reader.result.split(",")[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+    if(!file) throw new Error("กรุณาเลือกไฟล์ PDF");
 
-    const payload = {
-      date: form.date.value,
-      subject: form.subject.value,
-      owner: form.owner.value,
-      note: form.note.value,
-      filename: file.name,
-      mimeType: file.type,
-      fileBase64: base64
-    };
+    const formData = new FormData();
+    formData.append("date", form.date.value);
+    formData.append("subject", form.subject.value);
+    formData.append("owner", form.owner.value);
+    formData.append("note", form.note.value);
+    formData.append("pdfFile", file);
 
-    const res = await fetch(GAS_URL,{
-      method: "POST",
-      mode: "cors",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(payload)
-    });
-
+    const res = await fetch(GAS_URL, { method: "POST", body: formData });
     const r = await res.json();
     loadingModal.hide();
 
@@ -74,19 +60,6 @@ btnSubmit.addEventListener("click", async () => {
       const downloadLink = document.getElementById("downloadQR");
       downloadLink.href = r.qrUrl;
       downloadLink.setAttribute("download", `QR_${r.number}.png`);
-      downloadLink.onclick = async e=>{
-        e.preventDefault();
-        const resp = await fetch(r.qrUrl);
-        const blob = await resp.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `QR_${r.number}.png`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      };
 
       form.reset();
       new bootstrap.Modal(document.getElementById("successModal")).show();
