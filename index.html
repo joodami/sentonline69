@@ -4,17 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ระบบเสนอเซ็นออนไลน์</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=K2D:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link href="style.css" rel="stylesheet">
 </head>
+
 <body>
 
 <div class="container my-3 col-xl-8 col-lg-9 col-md-10 col-sm-12">
   <img src="https://github.com/joodami/school-assets/blob/main/banner%20senonline69.jpg?raw=true"
        class="img-fluid rounded shadow mb-4 w-100">
+
   <div class="card shadow form-card p-4 mb-4">
     <h3 class="text-center mb-4 fw-bold text-primary">ระบบเสนอเซ็นออนไลน์</h3>
+
     <form id="formData"
       action="https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"
       method="post"
@@ -22,36 +26,36 @@
       target="hidden_iframe"
       novalidate>
 
-  <label>วันที่</label>
-  <input type="date" name="date" class="form-control mb-3" required>
+      <label>วันที่</label>
+      <input type="date" name="date" class="form-control mb-3" required>
 
-  <label>เรื่อง</label>
-  <textarea name="subject" class="form-control mb-3" rows="1" required></textarea>
+      <label>เรื่อง</label>
+      <textarea name="subject" class="form-control mb-3" rows="1" required></textarea>
 
-  <label>ผู้เสนอ</label>
-  <input type="text" name="owner" class="form-control mb-3" required>
+      <label>ผู้เสนอ</label>
+      <input type="text" name="owner" class="form-control mb-3" required>
 
-  <label>หมายเหตุ</label>
-  <textarea name="note" class="form-control mb-3" rows="2"></textarea>
+      <label>หมายเหตุ</label>
+      <textarea name="note" class="form-control mb-3" rows="2"></textarea>
 
-  <label>อัปโหลดไฟล์ PDF</label>
-  <input type="file" name="pdfFile" accept="application/pdf" class="form-control mb-4" required>
+      <label>อัปโหลดไฟล์ PDF</label>
+      <input type="file" name="pdfFile" accept="application/pdf" class="form-control mb-4" required>
 
-  <button type="button" id="btnNext" class="btn custom-btn w-100 py-2">
-    ถัดไป
-  </button>
-</form>
-
-<iframe name="hidden_iframe" style="display:none;"></iframe>
-
+      <button type="button" id="btnNext" class="btn custom-btn w-100 py-2">
+        ถัดไป
+      </button>
+    </form>
   </div>
+
   <div class="text-center text-secondary small mb-4">
     © 2569 งานสารบรรณโรงเรียน สำนักงานอำนวยการ
   </div>
 </div>
 
+<!-- iframe สำหรับ submit -->
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+
 <!-- MODALS -->
-<!-- ยืนยันข้อมูล -->
 <div class="modal fade" id="confirmModal" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content modal-gradient-blue rounded-4">
@@ -67,7 +71,6 @@
   </div>
 </div>
 
-<!-- กำลังส่ง -->
 <div class="modal fade" id="loadingModal" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content modal-gradient-lightblue rounded-4">
@@ -79,7 +82,6 @@
   </div>
 </div>
 
-<!-- สำเร็จ -->
 <div class="modal fade" id="successModal" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm">
     <div class="modal-content modal-gradient-green rounded-4">
@@ -88,8 +90,8 @@
       </div>
       <div class="modal-body" id="successDetail"></div>
       <div class="text-center mb-3">
-        <img id="qrCodeImg" width="140" alt="QR Code"><br>
-        <a id="downloadQR" class="btn btn-outline-success btn-sm mt-2" href="#">ดาวน์โหลด QR Code</a>
+        <img id="qrCodeImg" width="140"><br>
+        <a id="downloadQR" class="btn btn-outline-success btn-sm mt-2">ดาวน์โหลด QR Code</a>
       </div>
       <div class="modal-footer border-0">
         <button class="btn btn-success w-100" data-bs-dismiss="modal">ตกลง</button>
