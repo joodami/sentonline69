@@ -1,3 +1,4 @@
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 const MAX_FILE_SIZE_MB = 50;
 
 const form = document.getElementById("formData");
@@ -31,30 +32,39 @@ btnNext.addEventListener("click", () => {
   confirmModal.show();
 });
 
-// STEP 2: ส่ง form ผ่าน iframe
-btnSubmit.addEventListener("click", () => {
+// STEP 2: ส่งข้อมูลด้วย fetch + FormData
+btnSubmit.addEventListener("click", async () => {
   confirmModal.hide();
   loadingModal.show();
-  form.submit();
-});
 
-// STEP 3: รับผลลัพธ์จาก GAS
-window.addEventListener("message", (e) => {
-  const data = e.data;
-  loadingModal.hide();
+  const formData = new FormData(form);
 
-  if(data.status === "success"){
-    qrImg.src = data.qrUrl;
-    downloadQR.href = data.qrUrl;
-    document.getElementById("successDetail").innerHTML = `
-      <b>ระบบรับข้อมูลเรียบร้อยแล้ว</b><br>
-      เลขที่เอกสาร: <b>${data.number}</b><br>
-      กรุณาตรวจสอบการแจ้งเตือนทาง LINE<br>
-      ใช้ QR Code เพื่อติดตามสถานะเอกสาร
-    `;
-    form.reset();
-    successModal.show();
-  } else {
-    alert("❌ เกิดข้อผิดพลาด: " + (data.message || "ไม่สามารถส่งข้อมูลได้"));
+  try {
+    const res = await fetch(GAS_URL, {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json(); // GAS ต้อง return JSON + CORS header
+
+    loadingModal.hide();
+
+    if(data.status === "success"){
+      qrImg.src = data.qrUrl;
+      downloadQR.href = data.qrUrl;
+      document.getElementById("successDetail").innerHTML = `
+        <b>ระบบรับข้อมูลเรียบร้อยแล้ว</b><br>
+        เลขที่เอกสาร: <b>${data.number}</b><br>
+        กรุณาตรวจสอบการแจ้งเตือนทาง LINE<br>
+        ใช้ QR Code เพื่อติดตามสถานะเอกสาร
+      `;
+      form.reset();
+      successModal.show();
+    } else {
+      alert("❌ เกิดข้อผิดพลาด: " + (data.message || "ไม่สามารถส่งข้อมูลได้"));
+    }
+  } catch(err) {
+    loadingModal.hide();
+    alert("❌ เกิดข้อผิดพลาด: " + err.message);
   }
 });
