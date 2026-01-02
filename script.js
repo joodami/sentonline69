@@ -1,29 +1,17 @@
-// ---------------------------
-// Config
-// ---------------------------
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // เปลี่ยนเป็น URL ของคุณ
+const GAS_URL = "YOUR_GAS_URL_HERE"; // URL จาก Deploy Web App
 const MAX_FILE_SIZE_MB = 20;
 
-// ---------------------------
-// Elements
-// ---------------------------
 const form = document.getElementById("formData");
 const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
-// ---------------------------
-// Next: แสดง Modal ยืนยัน
-// ---------------------------
+// Next
 btnNext.addEventListener("click", () => {
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return;
-  }
-
+  if (!form.checkValidity()) { form.reportValidity(); return; }
   const file = pdfFile.files[0];
   if (!file) return alert("กรุณาเลือกไฟล์ PDF");
-  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert(`ไฟล์เกิน ${MAX_FILE_SIZE_MB} MB`);
+  if (file.size > MAX_FILE_SIZE_MB*1024*1024) return alert(`ไฟล์เกิน ${MAX_FILE_SIZE_MB} MB`);
 
   document.getElementById("confirmText").innerHTML = `
     <b>วันที่:</b> ${form.date.value}<br>
@@ -32,13 +20,10 @@ btnNext.addEventListener("click", () => {
     <b>หมายเหตุ:</b> ${form.note.value || "-"}<br>
     <b>ไฟล์:</b> ${file.name}
   `;
-
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
-// ---------------------------
-// Submit: ส่งข้อมูลไป GAS
-// ---------------------------
+// Submit
 btnSubmit.addEventListener("click", async () => {
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
   const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
@@ -46,11 +31,9 @@ btnSubmit.addEventListener("click", async () => {
 
   try {
     const file = pdfFile.files[0];
-
-    // แปลง PDF เป็น Base64
-    const base64 = await new Promise((resolve, reject) => {
+    const base64 = await new Promise((resolve,reject)=>{
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onload = ()=>resolve(reader.result.split(",")[1]);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
@@ -65,19 +48,17 @@ btnSubmit.addEventListener("click", async () => {
       fileBase64: base64
     };
 
-    // ส่ง POST ไป GAS
-    const res = await fetch(GAS_URL, {
+    const res = await fetch(GAS_URL,{
       method: "POST",
       mode: "cors",
-      headers: { "Content-Type": "application/json" },
+      headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });
 
-    const r = await res.json(); // แปลง response เป็น JSON
+    const r = await res.json();
     loadingModal.hide();
 
-    if (r.status === "success") {
-      // แสดงรายละเอียด
+    if(r.status==="success"){
       document.getElementById("successDetail").innerHTML = `
         <b>เลขที่เอกสาร:</b> ${r.number}<br>
         <b>วันที่:</b> ${r.date}<br>
@@ -88,15 +69,12 @@ btnSubmit.addEventListener("click", async () => {
         <b>LINE Status:</b> ${r.lineStatus}
       `;
 
-      // QR Code
       const qrImg = document.getElementById("qrCodeImg");
       qrImg.src = r.qrUrl;
-
-      // ดาวน์โหลด QR Code
       const downloadLink = document.getElementById("downloadQR");
       downloadLink.href = r.qrUrl;
       downloadLink.setAttribute("download", `QR_${r.number}.png`);
-      downloadLink.onclick = async (e) => {
+      downloadLink.onclick = async e=>{
         e.preventDefault();
         const resp = await fetch(r.qrUrl);
         const blob = await resp.blob();
@@ -110,15 +88,12 @@ btnSubmit.addEventListener("click", async () => {
         URL.revokeObjectURL(url);
       };
 
-      // รีเซ็ตฟอร์ม
       form.reset();
       new bootstrap.Modal(document.getElementById("successModal")).show();
-
     } else {
       alert("ส่งข้อมูลไม่สำเร็จ: " + r.message);
     }
-
-  } catch (err) {
+  } catch(err){
     loadingModal.hide();
     alert("ส่งข้อมูลไม่สำเร็จ: " + err.message);
     console.error(err);
