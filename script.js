@@ -1,12 +1,12 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // เปลี่ยนเป็น URL ของคุณ
-const MAX_FILE_SIZE_MB = 20;
+const GAS_URL = "https://script.google.com/macros/s/YOUR_GAS_DEPLOY_ID/exec"; // URL ของคุณ
+const MAX_FILE_SIZE_MB = 50; // รองรับไฟล์ใหญ่ขึ้น
 
 const form = document.getElementById("formData");
 const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
-// แสดง modal ยืนยัน
+// Next
 btnNext.addEventListener("click", () => {
   if (!form.checkValidity()) { form.reportValidity(); return; }
   const file = pdfFile.files[0];
@@ -23,7 +23,7 @@ btnNext.addEventListener("click", () => {
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
-// ส่งข้อมูลไป GAS (FormData POST)
+// Submit
 btnSubmit.addEventListener("click", async () => {
   bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
   const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
@@ -54,7 +54,6 @@ btnSubmit.addEventListener("click", async () => {
         <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a><br>
         <b>LINE Status:</b> ${r.lineStatus}
       `;
-
       const qrImg = document.getElementById("qrCodeImg");
       qrImg.src = r.qrUrl;
       const downloadLink = document.getElementById("downloadQR");
