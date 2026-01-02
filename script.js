@@ -1,7 +1,7 @@
 // ---------------------------
 // Config
 // ---------------------------
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // ใส่ URL ใหม่ที่ deploy
+const GAS_URL = "https://script.google.com/macros/s/YOUR_DEPLOY_URL_HERE/exec"; // เปลี่ยนเป็น URL ของคุณ
 const MAX_FILE_SIZE_MB = 20;
 
 // ---------------------------
@@ -16,9 +16,9 @@ const pdfFile = document.getElementById("pdfFile");
 // Next: แสดง Modal ยืนยัน
 // ---------------------------
 btnNext.addEventListener("click", () => {
-  if (!form.checkValidity()) { 
-    form.reportValidity(); 
-    return; 
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
   }
 
   const file = pdfFile.files[0];
@@ -32,6 +32,7 @@ btnNext.addEventListener("click", () => {
     <b>หมายเหตุ:</b> ${form.note.value || "-"}<br>
     <b>ไฟล์:</b> ${file.name}
   `;
+  
   new bootstrap.Modal(document.getElementById("confirmModal")).show();
 });
 
@@ -46,6 +47,7 @@ btnSubmit.addEventListener("click", async () => {
   try {
     const file = pdfFile.files[0];
 
+    // แปลงไฟล์ PDF เป็น Base64
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result.split(",")[1]);
@@ -63,28 +65,29 @@ btnSubmit.addEventListener("click", async () => {
       fileBase64: base64
     };
 
-const res = await fetch(GAS_URL, {
-  method: "POST",
-  mode: "cors",  // ✅
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload)
-});
-
+    // ส่งไป GAS
+    const res = await fetch(GAS_URL, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
     const resText = await res.text();
     let r;
-    try { 
-      r = JSON.parse(resText); 
-    } catch(err) { 
-      loadingModal.hide(); 
-      alert("ไม่สามารถ parse response จาก server"); 
-      console.error(resText); 
-      return; 
+    try {
+      r = JSON.parse(resText);
+    } catch(err) {
+      loadingModal.hide();
+      alert("ไม่สามารถ parse response จาก server");
+      console.error(resText);
+      return;
     }
 
     loadingModal.hide();
 
     if (r.status === "success") {
+      // แสดงรายละเอียดสำเร็จ
       document.getElementById("successDetail").innerHTML = `
         <b>เลขที่เอกสาร:</b> ${r.number}<br>
         <b>วันที่:</b> ${r.date}<br>
@@ -94,19 +97,16 @@ const res = await fetch(GAS_URL, {
         <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
       `;
 
-      // ---------------------------
-      // แสดง QR Code จาก Drive
-      // ---------------------------
+      // แสดง QR Code
       const qrImg = document.getElementById("qrCodeImg");
       qrImg.src = r.qrUrl;
 
-      // ---------------------------
-      // ดาวน์โหลด QR Code ทันทีจาก Drive
-      // ---------------------------
+      // ตั้งค่าลิงก์ดาวน์โหลด QR Code
       const downloadLink = document.getElementById("downloadQR");
       downloadLink.href = r.qrUrl;
       downloadLink.setAttribute("download", `QR_${r.number}.png`);
 
+      // ดาวน์โหลด QR Code แบบสร้าง Blob
       downloadLink.addEventListener("click", async (e) => {
         e.preventDefault();
         const resp = await fetch(r.qrUrl);
@@ -121,6 +121,7 @@ const res = await fetch(GAS_URL, {
         URL.revokeObjectURL(url);
       });
 
+      // รีเซ็ต form
       form.reset();
       new bootstrap.Modal(document.getElementById("successModal")).show();
     } else {
