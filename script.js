@@ -1,5 +1,4 @@
 const MAX_FILE_SIZE_MB = 50;
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // ใส่ URL Web App ของคุณ
 
 const form = document.getElementById("formData");
 const btnNext = document.getElementById("btnNext");
@@ -32,46 +31,30 @@ btnNext.addEventListener("click", () => {
   confirmModal.show();
 });
 
-// STEP 2: ส่งข้อมูลจริง
+// STEP 2: ส่ง form ผ่าน iframe
 btnSubmit.addEventListener("click", () => {
   confirmModal.hide();
   loadingModal.show();
+  form.submit();
+});
 
-  const formData = new FormData(form);
+// STEP 3: รับผลลัพธ์จาก GAS
+window.addEventListener("message", (e) => {
+  const data = e.data;
+  loadingModal.hide();
 
-  fetch(GAS_URL, { method: "POST", body: formData })
-    .then(res => res.text())
-    .then(html => {
-      const temp = document.createElement('div');
-      temp.innerHTML = html;
-      const script = temp.querySelector('script');
-      let data = {};
-      if(script){
-        const match = script.textContent.match(/window\.parent\.postMessage\((.*), "\*"\)/);
-        if(match && match[1]){
-          data = JSON.parse(match[1]);
-        }
-      }
-
-      loadingModal.hide();
-
-      if(data.status === "success"){
-        qrImg.src = data.qrUrl;
-        downloadQR.href = data.qrUrl;
-        document.getElementById("successDetail").innerHTML = `
-          <b>ระบบรับข้อมูลเรียบร้อยแล้ว</b><br>
-          เลขที่เอกสาร: <b>${data.number}</b><br>
-          กรุณาตรวจสอบการแจ้งเตือนทาง LINE<br>
-          ใช้ QR Code เพื่อติดตามสถานะเอกสาร
-        `;
-        form.reset();
-        successModal.show();
-      } else {
-        alert("❌ เกิดข้อผิดพลาด: " + (data.message || "ไม่สามารถส่งข้อมูลได้"));
-      }
-
-    }).catch(err => {
-      loadingModal.hide();
-      alert("❌ เกิดข้อผิดพลาด: " + err.message);
-    });
+  if(data.status === "success"){
+    qrImg.src = data.qrUrl;
+    downloadQR.href = data.qrUrl;
+    document.getElementById("successDetail").innerHTML = `
+      <b>ระบบรับข้อมูลเรียบร้อยแล้ว</b><br>
+      เลขที่เอกสาร: <b>${data.number}</b><br>
+      กรุณาตรวจสอบการแจ้งเตือนทาง LINE<br>
+      ใช้ QR Code เพื่อติดตามสถานะเอกสาร
+    `;
+    form.reset();
+    successModal.show();
+  } else {
+    alert("❌ เกิดข้อผิดพลาด: " + (data.message || "ไม่สามารถส่งข้อมูลได้"));
+  }
 });
