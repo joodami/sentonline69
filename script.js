@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // URL ของคุณ
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 const MAX_FILE_SIZE_MB = 50;
 
 const form = document.getElementById("formData");
@@ -6,12 +6,29 @@ const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
 const pdfFile = document.getElementById("pdfFile");
 
-// แสดง modal ยืนยัน
+const confirmModal = document.getElementById("confirmModal");
+const loadingModal = document.getElementById("loadingModal");
+const successModal = document.getElementById("successModal");
+
+// ===============================
+// STEP 1 : แสดง Modal ตรวจสอบข้อมูล
+// ===============================
 btnNext.addEventListener("click", () => {
-  if (!form.checkValidity()) { form.reportValidity(); return; }
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
   const file = pdfFile.files[0];
-  if (!file) return alert("กรุณาเลือกไฟล์ PDF");
-  if (file.size > MAX_FILE_SIZE_MB*1024*1024) return alert(`ไฟล์เกิน ${MAX_FILE_SIZE_MB} MB`);
+  if (!file) {
+    alert("กรุณาเลือกไฟล์ PDF");
+    return;
+  }
+
+  if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+    alert(`ไฟล์ต้องไม่เกิน ${MAX_FILE_SIZE_MB} MB`);
+    return;
+  }
 
   document.getElementById("confirmText").innerHTML = `
     <b>วันที่:</b> ${form.date.value}<br>
@@ -20,55 +37,59 @@ btnNext.addEventListener("click", () => {
     <b>หมายเหตุ:</b> ${form.note.value || "-"}<br>
     <b>ไฟล์:</b> ${file.name}
   `;
-  new bootstrap.Modal(document.getElementById("confirmModal")).show();
+
+  new bootstrap.Modal(confirmModal).show();
 });
 
-// ส่งข้อมูลไป GAS
-btnSubmit.addEventListener("click", async () => {
-  bootstrap.Modal.getInstance(document.getElementById("confirmModal")).hide();
-  const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
-  loadingModal.show();
+// ===============================
+// STEP 2 : ส่งข้อมูลจริง (ใช้ form POST)
+// ===============================
+btnSubmit.addEventListener("click", () => {
+  bootstrap.Modal.getInstance(confirmModal).hide();
+  new bootstrap.Modal(loadingModal).show();
 
-  try {
-    const file = pdfFile.files[0];
-    if(!file) throw new Error("กรุณาเลือกไฟล์ PDF");
+  // 🔹 กำหนด action ให้ฟอร์ม
+  form.action = GAS_URL;
+  form.method = "POST";
+  form.enctype = "multipart/form-data";
+  form.target = "hidden_iframe";
 
-    const formData = new FormData();
-    formData.append("date", form.date.value);
-    formData.append("subject", form.subject.value);
-    formData.append("owner", form.owner.value);
-    formData.append("note", form.note.value);
-    formData.append("pdfFile", file);
+  form.submit();
+});
 
-    const res = await fetch(GAS_URL, { method: "POST", body: formData });
-    const r = await res.json();
-    loadingModal.hide();
+// ===============================
+// STEP 3 : รับผลลัพธ์จาก iframe
+// ===============================
+window.addEventListener("message", (event) => {
+  if (!event.data) return;
 
-    if(r.status==="success"){
-      document.getElementById("successDetail").innerHTML = `
-        <b>เลขที่เอกสาร:</b> ${r.number}<br>
-        <b>วันที่:</b> ${r.date}<br>
-        <b>เรื่อง:</b> ${r.subject}<br>
-        <b>ผู้เสนอ:</b> ${r.owner}<br>
-        <b>หมายเหตุ:</b> ${r.note || "-"}<br>
-        <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a><br>
-        <b>LINE Status:</b> ${r.lineStatus}<br>
-        <a href="track.html?doc=${r.number}" class="btn btn-sm btn-outline-primary mt-2">ติดตามเอกสาร</a>
-      `;
-      const qrImg = document.getElementById("qrCodeImg");
-      qrImg.src = r.qrUrl;
-      const downloadLink = document.getElementById("downloadQR");
-      downloadLink.href = r.qrUrl;
-      downloadLink.setAttribute("download", `QR_${r.number}.png`);
+  if (event.data.status === "success") {
+    bootstrap.Modal.getInstance(loadingModal).hide();
 
-      form.reset();
-      new bootstrap.Modal(document.getElementById("successModal")).show();
-    } else {
-      alert("ส่งข้อมูลไม่สำเร็จ: " + r.message);
-    }
-  } catch(err){
-    loadingModal.hide();
-    alert("ส่งข้อมูลไม่สำเร็จ: " + err.message);
-    console.error(err);
+    document.getElementById("successDetail").innerHTML = `
+      <b>เลขที่เอกสาร:</b> ${event.data.number}<br>
+      <b>วันที่:</b> ${event.data.date}<br>
+      <b>เรื่อง:</b> ${event.data.subject}<br>
+      <b>ผู้เสนอ:</b> ${event.data.owner}<br>
+      <b>หมายเหตุ:</b> ${event.data.note || "-"}<br>
+      <a href="${event.data.pdfUrl}" target="_blank">📎 เปิดไฟล์ PDF</a><br>
+      <a href="${event.data.trackUrl}" target="_blank"
+        class="btn btn-sm btn-outline-primary mt-2">ติดตามเอกสาร</a>
+    `;
+
+    const qrImg = document.getElementById("qrCodeImg");
+    qrImg.src = event.data.qrUrl;
+
+    const downloadLink = document.getElementById("downloadQR");
+    downloadLink.href = event.data.qrUrl;
+    downloadLink.download = `QR_${event.data.number}.png`;
+
+    form.reset();
+    new bootstrap.Modal(successModal).show();
+  }
+
+  if (event.data.status === "error") {
+    bootstrap.Modal.getInstance(loadingModal).hide();
+    alert("ส่งข้อมูลไม่สำเร็จ: " + event.data.message);
   }
 });
