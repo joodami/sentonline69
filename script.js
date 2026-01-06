@@ -84,21 +84,22 @@ btnSubmit.addEventListener("click", async () => {
       <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
     `;
 
-    // แสดง QR
+    // ===========================
+    // แสดง QR (แก้ชื่อ field เท่านั้น)
+    // ===========================
     const qrImg = document.getElementById("qrCodeImg");
-    qrImg.src = r.qrCodeUrl;
+    qrImg.src = r.qrUrl;   // ✅ จากเดิม r.qrCodeUrl
 
     // ===========================
-    // Download QR (Desktop + iPhone Safari 100%)
+    // Download QR (ไม่เปิดแท็บใหม่)
     // ===========================
     const downloadBtn = document.getElementById("downloadQR");
 
     downloadBtn.onclick = async () => {
       try {
-        const response = await fetch(r.qrCodeUrl);
+        const response = await fetch(r.qrUrl); // ✅ แก้ชื่อ field
         const blob = await response.blob();
 
-        // Safari iOS fallback
         const reader = new FileReader();
         reader.onloadend = () => {
           const a = document.createElement("a");
