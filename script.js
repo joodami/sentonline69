@@ -1,12 +1,6 @@
-// ---------------------------
-// Config
-// ---------------------------
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec"; // ใส่ URL ใหม่ที่ deploy
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 const MAX_FILE_SIZE_MB = 20;
 
-// ---------------------------
-// Elements
-// ---------------------------
 const form = document.getElementById("formData");
 const btnNext = document.getElementById("btnNext");
 const btnSubmit = document.getElementById("btnSubmit");
@@ -16,11 +10,7 @@ const pdfFile = document.getElementById("pdfFile");
 // Next: แสดง Modal ยืนยัน
 // ---------------------------
 btnNext.addEventListener("click", () => {
-  if (!form.checkValidity()) { 
-    form.reportValidity(); 
-    return; 
-  }
-
+  if (!form.checkValidity()) { form.reportValidity(); return; }
   const file = pdfFile.files[0];
   if (!file) return alert("กรุณาเลือกไฟล์ PDF");
   if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) return alert(`ไฟล์เกิน ${MAX_FILE_SIZE_MB} MB`);
@@ -45,7 +35,6 @@ btnSubmit.addEventListener("click", async () => {
 
   try {
     const file = pdfFile.files[0];
-
     const base64 = await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result.split(",")[1]);
@@ -65,20 +54,13 @@ btnSubmit.addEventListener("click", async () => {
 
     const res = await fetch(GAS_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
     const resText = await res.text();
     let r;
-    try { 
-      r = JSON.parse(resText); 
-    } catch(err) { 
-      loadingModal.hide(); 
-      alert("ไม่สามารถ parse response จาก server"); 
-      console.error(resText); 
-      return; 
-    }
+    try { r = JSON.parse(resText); } 
+    catch(err) { loadingModal.hide(); alert("ไม่สามารถ parse response จาก server"); console.error(resText); return; }
 
     loadingModal.hide();
 
@@ -92,31 +74,23 @@ btnSubmit.addEventListener("click", async () => {
         <a href="${r.pdfUrl}" target="_blank">เปิดไฟล์ PDF</a>
       `;
 
-      // ---------------------------
-      // แสดง QR Code จาก Drive
-      // ---------------------------
       const qrImg = document.getElementById("qrCodeImg");
-      qrImg.src = r.qrUrl;
+      qrImg.src = r.qrCodeUrl;
 
-      // ---------------------------
-      // ดาวน์โหลด QR Code ทันทีจาก Drive
-      // ---------------------------
       const downloadLink = document.getElementById("downloadQR");
-      downloadLink.href = r.qrUrl;
-      downloadLink.setAttribute("download", `QR_${r.number}.png`);
-
-      downloadLink.addEventListener("click", async (e) => {
+      downloadLink.replaceWith(downloadLink.cloneNode(true)); 
+      const newDownloadLink = document.getElementById("downloadQR");
+      newDownloadLink.addEventListener("click", async (e) => {
         e.preventDefault();
-        const resp = await fetch(r.qrUrl);
-        const blob = await resp.blob();
-        const url = URL.createObjectURL(blob);
+        const qrRes = await fetch(r.qrCodeUrl);
+        const blob = await qrRes.blob();
         const a = document.createElement("a");
-        a.href = url;
+        a.href = URL.createObjectURL(blob);
         a.download = `QR_${r.number}.png`;
         document.body.appendChild(a);
         a.click();
         a.remove();
-        URL.revokeObjectURL(url);
+        URL.revokeObjectURL(a.href);
       });
 
       form.reset();
