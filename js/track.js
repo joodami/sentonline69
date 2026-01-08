@@ -1,19 +1,25 @@
-const params = new URLSearchParams(window.location.search);
-const docId = params.get("id");
-if(docId){
-  fetch(`https://script.google.com/macros/s/AKfycbwuDcU1vMre_FwOFpc-0HIP-SHwYepp25iBq2wJ8twk53BXNVaNklx0d7IzvRzFeEMi/exec?id=${docId}`)
-  .then(r=>r.json())
-  .then(data=>{
-    const container = document.getElementById("docInfo");
-    if(data.status==="error"){ container.innerText = data.message; return; }
-    container.innerHTML = `
-      <p><b>เลขเอกสาร:</b> ${data.docNo}</p>
-      <p><b>วันที่:</b> ${data.date}</p>
-      <p><b>เรื่อง:</b> ${data.subject}</p>
-      <p><b>ผู้เสนอ:</b> ${data.presenter}</p>
-      <p><b>หมายเหตุ:</b> ${data.note}</p>
-      <p><b>ไฟล์เอกสาร:</b> <a href="${data.file}" target="_blank">คลิกดู PDF</a></p>
-      <p><b>สถานะ:</b> ${data.status}</p>
-    `;
-  });
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwuDcU1vMre_FwOFpc-0HIP-SHwYepp25iBq2wJ8twk53BXNVaNklx0d7IzvRzFeEMi/exec";
+
+function getDocId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id");
 }
+
+async function fetchDoc(docId) {
+  try {
+    const res = await fetch(`${GAS_URL}?id=${docId}`);
+    const data = await res.json();
+    document.getElementById("docNo").textContent = data.docNo;
+    document.getElementById("date").textContent = data.date;
+    document.getElementById("subject").textContent = data.subject;
+    document.getElementById("presenter").textContent = data.presenter;
+    document.getElementById("note").textContent = data.note;
+    document.getElementById("fileLink").href = data.file;
+    document.getElementById("status").textContent = data.status;
+  } catch(err) {
+    alert("ไม่สามารถดึงข้อมูลเอกสารได้");
+  }
+}
+
+const docId = getDocId();
+if (docId) fetchDoc(docId);
