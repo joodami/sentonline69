@@ -3,7 +3,7 @@ const resultDiv = document.getElementById("result");
 const qrImg = document.getElementById("qrImg");
 const downloadBtn = document.getElementById("downloadBtn");
 
-// ใส่ URL ของ GAS Web App ของคุณ
+// ใส่ URL ของ GAS Web App ของคุณ (Deploy เป็น "Anyone, even anonymous")
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxoIvxr_ZfswqI-Yxw2rbL5BavUx2PLa8FbyU6W37OwXxcAE0eg5GcUBbBnL6KYEvmd/exec";
 
 form.addEventListener("submit", async (e) => {
@@ -32,12 +32,11 @@ form.addEventListener("submit", async (e) => {
         body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" }
       });
-
       const data = await res.json();
 
       if (data.status === "success") {
         qrImg.src = data.qrCodeUrl;
-        downloadBtn.href = data.pdfUrl; // หลังจาก processPDF จะมี URL จริงใน Drive
+        downloadBtn.href = data.pdfUrl;
         resultDiv.style.display = "block";
         form.reset();
       } else {
