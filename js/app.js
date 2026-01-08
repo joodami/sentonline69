@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/YOUR_DEPLOY_ID/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwuDcU1vMre_FwOFpc-0HIP-SHwYepp25iBq2wJ8twk53BXNVaNklx0d7IzvRzFeEMi/exec";
 
 document.getElementById("docForm").addEventListener("submit", function (e) {
   e.preventDefault();
