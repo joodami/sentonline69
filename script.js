@@ -32,11 +32,12 @@ form.addEventListener("submit", async (e) => {
         body: JSON.stringify(payload),
         headers: { "Content-Type": "application/json" }
       });
+
       const data = await res.json();
 
       if (data.status === "success") {
         qrImg.src = data.qrCodeUrl;
-        downloadBtn.href = ""; // ยังไม่รู้ pdfUrl ตอนนี้
+        downloadBtn.href = data.pdfUrl; // หลังจาก processPDF จะมี URL จริงใน Drive
         resultDiv.style.display = "block";
         form.reset();
       } else {
