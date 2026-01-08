@@ -1,42 +1,28 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwuDcU1vMre_FwOFpc-0HIP-SHwYepp25iBq2wJ8twk53BXNVaNklx0d7IzvRzFeEMi/exec";
-
-document.getElementById("docForm").addEventListener("submit", function (e) {
+document.getElementById("docForm").addEventListener("submit", async function(e){
   e.preventDefault();
   const form = e.target;
-  const fd = new FormData(form);
-
-  // สร้าง UUID สำหรับเอกสาร
+  const formData = new FormData(form);
   const docId = crypto.randomUUID();
-  fd.append("docId", docId);
+  formData.append("docId", docId);
 
-  // QR Code URL
-  const trackUrl = `track.html?id=${docId}`;
+  try {
+    const resp = await fetch("https://script.google.com/macros/s/AKfycbwuDcU1vMre_FwOFpc-0HIP-SHwYepp25iBq2wJ8twk53BXNVaNklx0d7IzvRzFeEMi/exec", {
+      method: "POST",
+      body: formData
+    });
+    const data = await resp.json();
+    if(data.status==="success"){
+      // แสดง QR Code
+      const trackUrl = `track.html?id=${docId}`;
+      QRCode.toCanvas(document.getElementById("qrCode"), trackUrl, function (error) {
+        if (error) console.error(error);
+      });
+      const trackLink = document.getElementById("trackLink");
+      trackLink.href = trackUrl;
+      trackLink.download = `track_${docId}.png`;
 
-  // ส่งข้อมูลไป GAS (no-cors)
-  fetch(GAS_URL, {
-    method: "POST",
-    body: fd,
-    mode: "no-cors"
-  });
-
-  // แสดง Modal + QR Code
-  showSuccessModal(trackUrl);
-
-  // ล้างฟอร์ม
-  form.reset();
+      new bootstrap.Modal(document.getElementById("successModal")).show();
+      form.reset();
+    }
+  } catch(err){ console.error(err); alert("ส่งข้อมูลไม่สำเร็จ"); }
 });
-
-function showSuccessModal(trackUrl) {
-  const qrDiv = document.getElementById("qrcode");
-  qrDiv.innerHTML = "";
-  new QRCode(qrDiv, { text: trackUrl, width: 180, height: 180 });
-
-  const img = qrDiv.querySelector("img");
-  if (img) {
-    const downloadBtn = document.getElementById("downloadQR");
-    downloadBtn.href = img.src;
-  }
-
-  const modal = new bootstrap.Modal(document.getElementById("successModal"));
-  modal.show();
-}
