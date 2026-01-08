@@ -36,7 +36,7 @@ form.addEventListener("submit", async (e) => {
 
       if (data.status === "success") {
         qrImg.src = data.qrCodeUrl;
-        downloadBtn.href = data.pdfUrl;
+        downloadBtn.href = ""; // ยังไม่รู้ pdfUrl ตอนนี้
         resultDiv.style.display = "block";
         form.reset();
       } else {
