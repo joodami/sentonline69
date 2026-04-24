@@ -25,7 +25,6 @@
             padding-bottom: 50px;
         }
 
-        /* Header Style */
         .app-header {
             background: var(--white);
             text-align: center;
@@ -38,32 +37,32 @@
         .app-title { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 0; }
         .app-subtitle { font-size: 0.9rem; color: #64748b; margin-bottom: 0; }
 
-        /* Form Card Style */
         .form-card {
-            max-width: 700px;
+            max-width: 750px;
             margin: 30px auto;
             background: var(--white);
             padding: 30px;
-            border-radius: 20px;
+            border-radius: 24px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
 
         .section-title {
             font-weight: 700;
             color: var(--primary);
-            border-left: 5px solid var(--primary);
+            border-left: 6px solid var(--primary);
             padding-left: 12px;
             margin: 25px 0 15px 0;
             font-size: 1.1rem;
+            background: #f8fafc;
+            padding: 8px 12px;
         }
 
-        .form-label { font-weight: 600; color: #475569; font-size: 0.9rem; }
+        .form-label { font-weight: 600; color: #475569; font-size: 0.95rem; margin-bottom: 8px; }
         
-        .form-control, .form-select {
-            border-radius: 10px;
+        .form-control {
+            border-radius: 12px;
             padding: 12px;
             border: 1px solid #e2e8f0;
-            font-size: 1rem;
         }
 
         .form-control:focus {
@@ -71,17 +70,16 @@
             box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
         }
 
-        /* Button Style */
         .btn-submit {
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
             border: none;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 16px;
+            border-radius: 15px;
             width: 100%;
             font-weight: 700;
             font-size: 1.1rem;
-            margin-top: 20px;
+            margin-top: 25px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(26, 82, 118, 0.2);
         }
@@ -92,21 +90,21 @@
             filter: brightness(1.1);
         }
 
-        /* Loading Overlay */
         #loadingOverlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             z-index: 9999;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            text-align: center;
+            padding: 20px;
         }
 
         @media (max-width: 768px) {
             .form-card { margin: 15px; padding: 20px; }
-            .app-title { font-size: 1.3rem; }
         }
     </style>
 </head>
@@ -121,34 +119,40 @@
 <div class="container">
     <div class="form-card">
         <form id="signForm">
-            <div class="section-title">ข้อมูลผู้เสนอเซ็น</div>
+            <div class="section-title">กรอกข้อมูลเพื่อเสนอเซ็น</div>
+            
             <div class="mb-3">
-                <label class="form-label">ชื่อ-นามสกุล</label>
+                <label class="form-label">วันที่</label>
                 <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="fas fa-user text-primary"></i></span>
+                    <span class="input-group-text bg-light text-primary"><i class="fas fa-calendar-alt"></i></span>
+                    <input type="date" id="docDate" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">เรื่อง</label>
+                <textarea id="bookTitle" class="form-control" rows="2" placeholder="ระบุชื่อเรื่องที่ต้องการเสนอเซ็น..." required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">ชื่อผู้เสนอเซ็น</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-primary"><i class="fas fa-user"></i></span>
                     <input type="text" id="senderName" class="form-control" placeholder="ระบุชื่อ-นามสกุลของคุณครู" required>
                 </div>
             </div>
 
-            <div class="section-title">รายละเอียดหนังสือ</div>
             <div class="mb-3">
-                <label class="form-label">เรื่อง / ชื่อหนังสือ</label>
-                <textarea id="bookTitle" class="form-control" rows="3" placeholder="ระบุชื่อเรื่องที่ต้องการเสนอเซ็น..." required></textarea>
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">เรียน (ถึงใคร)</label>
-                <input type="text" id="sendTo" class="form-control" placeholder="เช่น ผู้อำนวยการโรงเรียนพิมานพิทยาสรรค์" required>
-            </div>
-
-            <div class="mb-4">
-                <label class="form-label">แนบไฟล์เอกสาร (PDF เท่านั้น)</label>
-                <div class="input-group">
-                    <input type="file" id="fileInput" class="form-control" accept=".pdf" required>
-                </div>
+                <label class="form-label">แนบไฟล์เสนอเซ็น (PDF เท่านั้น)</label>
+                <input type="file" id="fileInput" class="form-control" accept=".pdf" required>
                 <div class="form-text text-danger mt-2">
                     <i class="fas fa-info-circle me-1"></i> รองรับไฟล์ขนาดไม่เกิน 50 MB
                 </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">หมายเหตุ</label>
+                <textarea id="remarks" class="form-control" rows="2" placeholder="ระบุหมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
             </div>
 
             <button type="submit" class="btn-submit" id="submitBtn">
@@ -159,18 +163,27 @@
 </div>
 
 <div id="loadingOverlay">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
-    <h5 class="mt-3 fw-bold text-primary">กำลังนำส่งข้อมูลและอัปโหลดไฟล์...</h5>
-    <p class="text-muted small">กรุณาอย่าปิดหน้านี้จนกว่าจะเสร็จสมบูรณ์</p>
+    <div class="spinner-border text-primary" style="width: 3.5rem; height: 3.5rem;" role="status"></div>
+    <h5 class="mt-4 fw-bold text-primary">กำลังดำเนินการ...</h5>
+    <p class="text-muted">ระบบกำลังอัปโหลดไฟล์</p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // ** สำคัญ: นำ URL ที่ได้จากการ Deploy Web App ใน GAS มาใส่ตรงนี้ค่ะ **
+    // --- อย่าลืมใส่ URL Web App จาก GAS นะคะ ---
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwLuCaClwlyTiMxxYl6fXMwK9WjE7pdvC3Sf1HdlDCRlHLy4OrwYSkxE8zfaMSjCdjOoQ/exec';
+
+    document.getElementById('docDate').valueAsDate = new Date();
 
     const form = document.getElementById('signForm');
     const loading = document.getElementById('loadingOverlay');
+
+    function formatDateThai(dateStr) {
+        if(!dateStr) return "";
+        const d = new Date(dateStr);
+        const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
+    }
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -178,70 +191,50 @@
         const fileInput = document.getElementById('fileInput');
         const file = fileInput.files[0];
 
-        // ตรวจสอบขนาดไฟล์ (50MB)
         if (file.size > 50 * 1024 * 1024) {
-            Swal.fire({
-                icon: 'error',
-                title: 'ไฟล์ใหญ่เกินไป',
-                text: 'ขออภัยค่ะ ระบบรองรับไฟล์ไม่เกิน 50 MB เท่านั้น',
-                confirmButtonColor: '#1a5276'
-            });
+            Swal.fire({ icon: 'error', title: 'ไฟล์ใหญ่เกินกำหนด', text: 'รองรับไฟล์ไม่เกิน 50 MB ค่ะ' });
             return;
         }
 
         loading.style.display = 'flex';
 
         try {
-            // อ่านไฟล์เป็น Base64
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = async function() {
                 const base64Data = reader.result.split(',')[1];
                 
-                // เตรียมข้อมูลส่งไป GAS
-// ค้นหาส่วน payload ในไฟล์ index.html เดิม แล้วแทนที่ด้วยส่วนนี้ค่ะ
-const payload = {
-    date: formatDateThai(document.getElementById('docDate').value),
-    name: document.getElementById('senderName').value,
-    title: document.getElementById('bookTitle').value,
-    to: document.getElementById('sendTo').value, // ข้อมูลนี้ใช้แจ้งเตือนในไลน์ แต่ในชีทครูไม่ได้เก็บคอลัมน์นี้ พิมจึงแยกไว้ค่ะ
-    remarks: "ส่งผ่านระบบ Web App", // จะไปลงในคอลัมน์ 6 (หมายเหตุ)
-    fileData: base64Data,
-    fileName: file.name,
-    fileType: file.type
-};
+                const payload = {
+                    date: formatDateThai(document.getElementById('docDate').value),
+                    title: document.getElementById('bookTitle').value,
+                    name: document.getElementById('senderName').value,
+                    remarks: document.getElementById('remarks').value || "-", // ส่งค่าจากช่องหมายเหตุ
+                    fileData: base64Data,
+                    fileName: file.name,
+                    fileType: file.type
+                };
 
-                // ส่งข้อมูลด้วย Fetch POST
-                const response = await fetch(WEB_APP_URL, {
+                await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // ใช้ no-cors สำหรับการส่งข้ามโดเมนอย่างง่าย
-                    cache: 'no-cache',
+                    mode: 'no-cors', 
                     body: JSON.stringify(payload)
                 });
 
-                // เนื่องจากใช้ no-cors เราจะไม่สามารถอ่าน response body ได้โดยตรง 
-                // แต่ถ้าไม่มี Error แสดงว่าส่งสำเร็จค่ะ
                 loading.style.display = 'none';
                 Swal.fire({
                     icon: 'success',
-                    title: 'ส่งเอกสารสำเร็จ!',
-                    text: 'ระบบได้บันทึกข้อมูลและแจ้งเตือนไปยังกลุ่ม LINE แล้วค่ะ',
+                    title: 'สำเร็จ!',
+                    text: 'บันทึกข้อมูลและแจ้งเตือน LINE เรียบร้อยแล้วค่ะ',
                     confirmButtonColor: '#1a5276'
                 }).then(() => {
                     form.reset();
-                    window.location.reload();
+                    document.getElementById('docDate').valueAsDate = new Date();
                 });
             };
 
         } catch (error) {
             loading.style.display = 'none';
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'ไม่สามารถส่งข้อมูลได้ โปรดตรวจสอบอินเทอร์เน็ตของท่าน',
-                confirmButtonColor: '#1a5276'
-            });
-            console.error(error);
+            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ไม่สามารถส่งข้อมูลได้' });
         }
     });
 </script>
