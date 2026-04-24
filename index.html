@@ -154,12 +154,15 @@
             </div>
 
             <div class="mb-4">
-                <label class="form-label">แนบไฟล์เสนอเซ็น (เฉพาะไฟล์ PDF)</label>
-                <input type="file" id="fileInput" class="form-control" accept=".pdf" required>
-                <div class="form-text text-danger mt-2">
-                    <i class="fas fa-info-circle me-1"></i> รองรับไฟล์ขนาดไม่เกิน 50 MB
-                </div>
-            </div>
+    <label class="form-label">แนบไฟล์เสนอเซ็น (เฉพาะไฟล์ PDF)</label>
+    <input type="file" id="fileInput" class="form-control" accept=".pdf" required>
+    <div id="fileSizeInfo" class="mt-2" style="display: none; font-size: 0.9rem;">
+        <i class="fas fa-file-alt me-1 text-primary"></i> ขนาดไฟล์: <span id="fileSizeValue" class="fw-bold"></span>
+    </div>
+    <div class="form-text text-danger mt-2">
+        <i class="fas fa-info-circle me-1"></i> รองรับไฟล์ขนาดไม่เกิน 50 MB
+    </div>
+</div>
 
             <div class="mb-4">
                 <label class="form-label">หมายเหตุ (ถ้ามี)</label>
@@ -268,13 +271,14 @@
                 });
 
                 // ถ้าส่งสำเร็จ (Status 200-299)
-                if (response.ok) {
-                    loading.style.display = 'none';
-
-                    // --- ส่วนที่เพิ่ม: ล้างข้อมูลในฟอร์มทันทีที่ส่งสำเร็จ ---
-                    form.reset();
-                    document.getElementById('docDate').valueAsDate = new Date();
-                    textareas.forEach(el => el.style.height = 'auto'); // คืนค่าความสูงช่องข้อความ
+               if (response.ok) {
+    loading.style.display = 'none';
+    form.reset();
+    document.getElementById('docDate').valueAsDate = new Date();
+    textareas.forEach(el => el.style.height = 'auto');
+    
+    // เพิ่มบรรทัดนี้เพื่อให้ชื่อขนาดไฟล์หายไปหลังจากส่งเสร็จ
+    document.getElementById('fileSizeInfo').style.display = 'none';
 
                     Swal.fire({
                         icon: 'success',
@@ -312,6 +316,31 @@
             }
         };
     });
+
+    // --- ส่วนที่เพิ่ม: ตรวจสอบและแสดงขนาดไฟล์ ---
+document.getElementById('fileInput').addEventListener('change', function() {
+    const fileSizeInfo = document.getElementById('fileSizeInfo');
+    const fileSizeValue = document.getElementById('fileSizeValue');
+    const file = this.files[0];
+
+    if (file) {
+        // แปลงจาก Byte เป็น MB (หารด้วย 1024 สองครั้ง)
+        const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+        fileSizeValue.innerText = sizeInMB + " MB";
+        fileSizeInfo.style.display = 'block';
+
+        // ถ้าไฟล์เกิน 50MB ให้แจ้งเตือนเป็นสีแดง
+        if (parseFloat(sizeInMB) > 50) {
+            fileSizeValue.classList.replace('text-primary', 'text-danger');
+            Swal.fire('ไฟล์มีขนาดใหญ่เกินไป', 'ไฟล์ของคุณมีขนาด ' + sizeInMB + ' MB ซึ่งเกินขีดจำกัด 50 MB ค่ะ', 'error');
+        } else {
+            fileSizeValue.classList.remove('text-danger');
+            fileSizeValue.classList.add('text-primary');
+        }
+    } else {
+        fileSizeInfo.style.display = 'none';
+    }
+});
 </script>
 
 </body>
