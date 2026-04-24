@@ -219,9 +219,9 @@
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const file = document.getElementById('fileInput').files[0];
-
-        if (file.size > 50 * 1024 * 1024) {
-            Swal.fire('ไฟล์ใหญ่เกินไป', 'ระบบรองรับไฟล์ไม่เกิน 50MB ค่ะ', 'error');
+        
+        if (!file) {
+            Swal.fire('กรุณาแนบไฟล์', 'ยังไม่ได้เลือกไฟล์ค่ะ', 'warning');
             return;
         }
 
@@ -230,40 +230,46 @@
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async function() {
-            const base64Data = reader.result.split(',')[1];
-            
             const payload = {
                 date: formatDateThai(document.getElementById('docDate').value),
                 title: document.getElementById('bookTitle').value,
                 name: document.getElementById('senderName').value,
                 remarks: document.getElementById('remarks').value || "-",
-                fileData: base64Data,
+                fileData: reader.result.split(',')[1],
                 fileName: file.name,
                 fileType: file.type
             };
 
             try {
-                // ส่งข้อมูลเข้า GAS (doPost)
-                await fetch(WEB_APP_URL, {
+                // *** จุดสำคัญ: ลองส่งแบบปกติเพื่อดักจับ Error ***
+                const response = await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'cors', // เปลี่ยนจาก no-cors เป็น cors
                     body: JSON.stringify(payload)
                 });
 
-                loading.style.display = 'none';
-                Swal.fire({
-                    icon: 'success',
-                    title: 'ส่งเอกสารสำเร็จ!',
-                    text: 'บันทึกข้อมูลและแจ้งเตือน LINE เรียบร้อยแล้วค่ะ',
-                    confirmButtonColor: '#1a5276'
-                }).then(() => {
-                    form.reset();
-                    document.getElementById('docDate').valueAsDate = new Date();
-                });
+                // ถ้าส่งสำเร็จ (Status 200-299)
+                if (response.ok) {
+                    loading.style.display = 'none';
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ส่งสำเร็จ!',
+                        text: 'ข้อมูลส่งถึง Google แล้วค่ะ',
+                        confirmButtonColor: '#1a5276'
+                    }).then(() => location.reload());
+                } else {
+                    throw new Error('Server returned ' + response.status);
+                }
 
             } catch (error) {
                 loading.style.display = 'none';
-                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
+                // *** ถ้าหน้า Executions ไม่ขึ้น แถบนี้จะบอกว่าติดอะไร ***
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ส่งไม่สำเร็จ (หน้าบ้าน)',
+                    text: 'Error: ' + error.message + ' | โปรดเช็คว่า Deployment ล่าสุดเป็น "Anyone" หรือยังคะ?',
+                    footer: '<a href="#">ทำไมถึงส่งไม่ได้?</a>'
+                });
             }
         };
     });
