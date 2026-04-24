@@ -182,28 +182,31 @@
     const loading = document.getElementById('loadingOverlay');
 
     // 1. ฟังก์ชันดึงรายชื่อครูจาก MemberDB อัตโนมัติ
-    async function loadMembers() {
-        try {
-            const response = await fetch(WEB_APP_URL);
-            const data = await response.json();
-            const select = document.getElementById('senderName');
-            
-            if (data.members && data.members.length > 0) {
-                select.innerHTML = '<option value="" disabled selected>--- เลือกชื่อของคุณครู ---</option>';
-                data.members.forEach(name => {
-                    let option = document.createElement('option');
-                    option.value = name;
-                    option.text = name;
-                    select.appendChild(option);
-                });
-            } else {
-                select.innerHTML = '<option value="" disabled selected>❌ ไม่พบรายชื่อใน MemberDB</option>';
-            }
-        } catch (error) {
-            console.error("Error loading members:", error);
-            document.getElementById('senderName').innerHTML = '<option value="" disabled selected>❌ โหลดรายชื่อล้มเหลว</option>';
+async function loadMembers() {
+    try {
+        const response = await fetch(WEB_APP_URL);
+        const data = await response.json();
+        const select = document.getElementById('senderName');
+        
+        if (data.members && data.members.length > 0) {
+            select.innerHTML = '<option value="" disabled selected>--- เลือกชื่อของคุณครู ---</option>';
+            data.members.forEach(member => {
+                let option = document.createElement('option');
+                // เนื่องจากตอนนี้ข้อมูลมาเป็นอ็อบเจกต์ {secretCode: "...", userName: "..."}
+                // เราต้องระบุ .userName เพื่อเอาชื่อมาโชว์ในช่องเลือกค่ะ
+                const name = member.userName; 
+                option.value = name;
+                option.text = name;
+                select.appendChild(option);
+            });
+        } else {
+            select.innerHTML = '<option value="" disabled selected>❌ ไม่พบรายชื่อใน MemberDB</option>';
         }
+    } catch (error) {
+        console.error("Error loading members:", error);
+        document.getElementById('senderName').innerHTML = '<option value="" disabled selected>❌ โหลดรายชื่อล้มเหลว</option>';
     }
+}
 
     // เรียกโหลดรายชื่อทันทีที่เปิดหน้าเว็บ
     loadMembers();
