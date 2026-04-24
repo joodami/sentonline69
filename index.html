@@ -33,60 +33,61 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .school-logo { height: 60px; margin-bottom: 10px; }
-        .app-title { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 0; }
-        .app-subtitle { font-size: 0.9rem; color: #64748b; margin-bottom: 0; }
+        .school-logo { height: 65px; margin-bottom: 10px; }
+        .app-title { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 0; }
+        .app-subtitle { font-size: 0.95rem; color: #64748b; margin-bottom: 0; }
 
         .form-card {
             max-width: 750px;
             margin: 30px auto;
             background: var(--white);
-            padding: 30px;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
 
         .section-title {
             font-weight: 700;
             color: var(--primary);
             border-left: 6px solid var(--primary);
-            padding-left: 12px;
-            margin: 25px 0 15px 0;
-            font-size: 1.1rem;
-            background: #f8fafc;
-            padding: 8px 12px;
+            padding: 8px 15px;
+            margin: 25px 0 20px 0;
+            font-size: 1.15rem;
+            background: #f1f5f9;
+            border-radius: 0 10px 10px 0;
         }
 
-        .form-label { font-weight: 600; color: #475569; font-size: 0.95rem; margin-bottom: 8px; }
+        .form-label { font-weight: 600; color: #475569; margin-bottom: 8px; }
         
-        .form-control {
+        .form-control, .form-select {
             border-radius: 12px;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s;
         }
 
-        .form-control:focus {
+        .form-control:focus, .form-select:focus {
             border-color: var(--primary-light);
-            box-shadow: 0 0 0 3px rgba(26, 82, 118, 0.1);
+            box-shadow: 0 0 0 4px rgba(26, 82, 118, 0.1);
         }
 
         .btn-submit {
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
             border: none;
-            padding: 16px;
+            padding: 18px;
             border-radius: 15px;
             width: 100%;
             font-weight: 700;
-            font-size: 1.1rem;
-            margin-top: 25px;
+            font-size: 1.15rem;
+            margin-top: 30px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(26, 82, 118, 0.2);
+            box-shadow: 0 8px 20px rgba(26, 82, 118, 0.25);
         }
 
         .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(26, 82, 118, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(26, 82, 118, 0.35);
             filter: brightness(1.1);
         }
 
@@ -94,17 +95,17 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             z-index: 9999;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 20px;
         }
 
         @media (max-width: 768px) {
-            .form-card { margin: 15px; padding: 20px; }
+            .form-card { margin: 15px; padding: 25px; }
+            .app-title { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -119,31 +120,33 @@
 <div class="container">
     <div class="form-card">
         <form id="signForm">
-            <div class="section-title">กรอกข้อมูลเพื่อเสนอเซ็น</div>
+            <div class="section-title"><i class="fas fa-file-signature me-2"></i>รายละเอียดการเสนอเซ็น</div>
             
-            <div class="mb-3">
+            <div class="mb-4">
                 <label class="form-label">วันที่</label>
                 <div class="input-group">
-                    <span class="input-group-text bg-light text-primary"><i class="fas fa-calendar-alt"></i></span>
+                    <span class="input-group-text bg-light text-primary"><i class="fas fa-calendar-day"></i></span>
                     <input type="date" id="docDate" class="form-control" required>
                 </div>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-4">
                 <label class="form-label">เรื่อง</label>
-                <textarea id="bookTitle" class="form-control" rows="2" placeholder="ระบุชื่อเรื่องที่ต้องการเสนอเซ็น..." required></textarea>
+                <textarea id="bookTitle" class="form-control" rows="2" placeholder="พิมพ์ชื่อเรื่องที่ต้องการเสนอเซ็น..." required></textarea>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-4">
                 <label class="form-label">ชื่อผู้เสนอเซ็น</label>
                 <div class="input-group">
-                    <span class="input-group-text bg-light text-primary"><i class="fas fa-user"></i></span>
-                    <input type="text" id="senderName" class="form-control" placeholder="ระบุชื่อ-นามสกุลของคุณครู" required>
+                    <span class="input-group-text bg-light text-primary"><i class="fas fa-user-tie"></i></span>
+                    <select id="senderName" class="form-select" required>
+                        <option value="" disabled selected>🔄 กำลังโหลดรายชื่อจากระบบ...</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">แนบไฟล์เสนอเซ็น (PDF เท่านั้น)</label>
+            <div class="mb-4">
+                <label class="form-label">แนบไฟล์เสนอเซ็น (เฉพาะไฟล์ PDF)</label>
                 <input type="file" id="fileInput" class="form-control" accept=".pdf" required>
                 <div class="form-text text-danger mt-2">
                     <i class="fas fa-info-circle me-1"></i> รองรับไฟล์ขนาดไม่เกิน 50 MB
@@ -151,8 +154,8 @@
             </div>
 
             <div class="mb-4">
-                <label class="form-label">หมายเหตุ</label>
-                <textarea id="remarks" class="form-control" rows="2" placeholder="ระบุหมายเหตุเพิ่มเติม (ถ้ามี)"></textarea>
+                <label class="form-label">หมายเหตุ (ถ้ามี)</label>
+                <textarea id="remarks" class="form-control" rows="2" placeholder="ระบุรายละเอียดเพิ่มเติม..."></textarea>
             </div>
 
             <button type="submit" class="btn-submit" id="submitBtn">
@@ -164,78 +167,105 @@
 
 <div id="loadingOverlay">
     <div class="spinner-border text-primary" style="width: 3.5rem; height: 3.5rem;" role="status"></div>
-    <h5 class="mt-4 fw-bold text-primary">กำลังดำเนินการ...</h5>
-    <p class="text-muted">ระบบกำลังอัปโหลดไฟล์</p>
+    <h5 class="mt-4 fw-bold text-primary">กำลังประมวลผล...</h5>
+    <p class="text-muted">ระบบกำลังบันทึกข้อมูลและส่งแจ้งเตือน LINE <br>กรุณาอย่าปิดหน้านี้จนกว่าจะเสร็จสิ้น</p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // --- อย่าลืมใส่ URL Web App จาก GAS นะคะ ---
+    // *** สำคัญ: นำ URL ที่ได้จาก New Deployment ล่าสุดมาใส่ที่นี่ ***
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwLuCaClwlyTiMxxYl6fXMwK9WjE7pdvC3Sf1HdlDCRlHLy4OrwYSkxE8zfaMSjCdjOoQ/exec';
 
+    // ตั้งค่าเริ่มต้น
     document.getElementById('docDate').valueAsDate = new Date();
-
     const form = document.getElementById('signForm');
     const loading = document.getElementById('loadingOverlay');
 
+    // 1. ฟังก์ชันดึงรายชื่อครูจาก MemberDB อัตโนมัติ
+    async function loadMembers() {
+        try {
+            const response = await fetch(WEB_APP_URL);
+            const data = await response.json();
+            const select = document.getElementById('senderName');
+            
+            if (data.members && data.members.length > 0) {
+                select.innerHTML = '<option value="" disabled selected>--- เลือกชื่อของคุณครู ---</option>';
+                data.members.forEach(name => {
+                    let option = document.createElement('option');
+                    option.value = name;
+                    option.text = name;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = '<option value="" disabled selected>❌ ไม่พบรายชื่อใน MemberDB</option>';
+            }
+        } catch (error) {
+            console.error("Error loading members:", error);
+            document.getElementById('senderName').innerHTML = '<option value="" disabled selected>❌ โหลดรายชื่อล้มเหลว</option>';
+        }
+    }
+
+    // เรียกโหลดรายชื่อทันทีที่เปิดหน้าเว็บ
+    loadMembers();
+
+    // 2. ฟังก์ชันแปลงวันที่ไทย
     function formatDateThai(dateStr) {
-        if(!dateStr) return "";
         const d = new Date(dateStr);
         const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear() + 543}`;
     }
 
+    // 3. ฟังก์ชันส่งฟอร์ม
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const fileInput = document.getElementById('fileInput');
-        const file = fileInput.files[0];
+        const file = document.getElementById('fileInput').files[0];
 
         if (file.size > 50 * 1024 * 1024) {
-            Swal.fire({ icon: 'error', title: 'ไฟล์ใหญ่เกินกำหนด', text: 'รองรับไฟล์ไม่เกิน 50 MB ค่ะ' });
+            Swal.fire('ไฟล์ใหญ่เกินไป', 'ระบบรองรับไฟล์ไม่เกิน 50MB ค่ะ', 'error');
             return;
         }
 
         loading.style.display = 'flex';
 
-        try {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async function() {
-                const base64Data = reader.result.split(',')[1];
-                
-                const payload = {
-                    date: formatDateThai(document.getElementById('docDate').value),
-                    title: document.getElementById('bookTitle').value,
-                    name: document.getElementById('senderName').value,
-                    remarks: document.getElementById('remarks').value || "-", // ส่งค่าจากช่องหมายเหตุ
-                    fileData: base64Data,
-                    fileName: file.name,
-                    fileType: file.type
-                };
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async function() {
+            const base64Data = reader.result.split(',')[1];
+            
+            const payload = {
+                date: formatDateThai(document.getElementById('docDate').value),
+                title: document.getElementById('bookTitle').value,
+                name: document.getElementById('senderName').value,
+                remarks: document.getElementById('remarks').value || "-",
+                fileData: base64Data,
+                fileName: file.name,
+                fileType: file.type
+            };
 
+            try {
+                // ส่งข้อมูลเข้า GAS (doPost)
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors', 
+                    mode: 'no-cors',
                     body: JSON.stringify(payload)
                 });
 
                 loading.style.display = 'none';
                 Swal.fire({
                     icon: 'success',
-                    title: 'สำเร็จ!',
+                    title: 'ส่งเอกสารสำเร็จ!',
                     text: 'บันทึกข้อมูลและแจ้งเตือน LINE เรียบร้อยแล้วค่ะ',
                     confirmButtonColor: '#1a5276'
                 }).then(() => {
                     form.reset();
                     document.getElementById('docDate').valueAsDate = new Date();
                 });
-            };
 
-        } catch (error) {
-            loading.style.display = 'none';
-            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ไม่สามารถส่งข้อมูลได้' });
-        }
+            } catch (error) {
+                loading.style.display = 'none';
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', 'error');
+            }
+        };
     });
 </script>
 
