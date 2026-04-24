@@ -248,15 +248,31 @@
                     body: JSON.stringify(payload)
                 });
 
-                // ถ้าส่งสำเร็จ (Status 200-299)
+               // ถ้าส่งสำเร็จ (Status 200-299)
                 if (response.ok) {
                     loading.style.display = 'none';
                     Swal.fire({
                         icon: 'success',
-                        title: 'ส่งสำเร็จ!',
-                        text: 'ข้อมูลส่งถึง Google แล้วค่ะ',
-                        confirmButtonColor: '#1a5276'
-                    }).then(() => location.reload());
+                        title: 'ส่งเอกสารสำเร็จ!',
+                        html: `
+                            <p class="mb-3">ระบบบันทึกข้อมูลเรียบร้อยแล้วค่ะ</p>
+                            <div style="background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px dashed #cbd5e1;">
+                                <p class="small text-muted mb-2">คุณครูสามารถติดตามผลการพิจารณาได้ที่</p>
+                                <a href="https://joodami.github.io/PS-Sarabun-V.1/" 
+                                   target="_blank" 
+                                   class="btn btn-primary w-100" 
+                                   style="border-radius: 12px; padding: 12px; font-weight: 600; text-decoration: none; background: #1a5276; border: none; box-shadow: 0 4px 10px rgba(26,82,118,0.2);">
+                                   <i class="fas fa-search me-2"></i> ตรวจสอบสถานะหนังสือ
+                                </a>
+                            </div>
+                        `,
+                        showConfirmButton: true,
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#64748b'
+                    }).then((result) => {
+                        // เมื่อกดปุ่มรับทราบ ให้รีโหลดหน้าเสนอเซ็นเพื่อเตรียมส่งใบใหม่
+                        location.reload();
+                    });
                 } else {
                     throw new Error('Server returned ' + response.status);
                 }
