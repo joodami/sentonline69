@@ -25,19 +25,31 @@
             padding-bottom: 50px;
         }
 
-        .app-header {
-            background: var(--white);
+               .app-header {
+            background: #ffffff;
             text-align: center;
-            /* แก้ไข: ปรับลด padding ด้านล่างให้ข้อความชิดเส้นคั่นมากขึ้น */
-            padding: 20px 15px 5px 15px; 
-            border-bottom: 5px solid var(--primary);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 3px solid var(--primary);
+            padding: 10px 5px 5px 5px;
+            flex-shrink: 0;
         }
 
-        .school-logo { height: 65px; margin-bottom: 10px; }
-        .app-title { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 0; }
-        /* แก้ไข: กำจัด margin-bottom ของ subtitle เพื่อไม่ให้ผลักเส้นคั่นลงไป */
-        .app-subtitle { font-size: 0.95rem; color: #64748b; margin-bottom: 0; } 
+        .school-logo { height: 40px; }
+        .app-title { font-size: 1.3rem; font-weight: 600; color: var(--primary); margin: 0; }
+        /* ค้นหา .app-subtitle ของเดิมแล้ววางทับด้วยอันนี้ค่ะ */
+.app-subtitle { 
+    color: #64748b; 
+    margin-bottom: 5px; 
+    font-size: 0.85rem; /* ขนาดเริ่มต้นสำหรับมือถือ */
+    font-weight: 600;    /* ปรับให้เป็นตัวหนา (สำหรับมือถือ) */
+}
+
+/* เพิ่มส่วนนี้เพื่อปรับขนาดให้ใหญ่ขึ้นเมื่อดูในคอมพิวเตอร์ (หน้าจอที่กว้างกว่า 768px) */
+@media (min-width: 768px) {
+    .app-subtitle {
+        font-size: 1.1rem; /* ปรับขนาดให้ใหญ่ขึ้นสำหรับคอม */
+        font-weight: 500;   /* ในคอมอาจจะลดความหนาลงนิดนึงเพื่อให้ดูสะอาดตา หรือจะใช้ 600 เท่ากันก็ได้ค่ะ */
+    }
+}
 
         .form-card {
             max-width: 750px;
