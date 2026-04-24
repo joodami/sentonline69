@@ -107,6 +107,14 @@
             .form-card { margin: 15px; padding: 25px; }
             .app-title { font-size: 1.4rem; }
         }
+
+        /* ปรับแต่งช่องข้อความให้ขยายตัวอัตโนมัติ */
+        textarea.form-control {
+            resize: none; /* ห้ามลากขยายเอง */
+            overflow: hidden; /* ซ่อนแถบเลื่อน */
+            min-height: 45px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -181,32 +189,40 @@
     const form = document.getElementById('signForm');
     const loading = document.getElementById('loadingOverlay');
 
+    // --- ส่วนที่เพิ่ม: ฟังก์ชันทำให้ช่องกรอกข้อความขยายตามการพิมพ์ ---
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(el => {
+        el.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    });
+
     // 1. ฟังก์ชันดึงรายชื่อครูจาก MemberDB อัตโนมัติ
-async function loadMembers() {
-    try {
-        const response = await fetch(WEB_APP_URL);
-        const data = await response.json();
-        const select = document.getElementById('senderName');
-        
-        if (data.members && data.members.length > 0) {
-            select.innerHTML = '<option value="" disabled selected>--- เลือกชื่อของคุณครู ---</option>';
-            data.members.forEach(member => {
-                let option = document.createElement('option');
-                // เนื่องจากตอนนี้ข้อมูลมาเป็นอ็อบเจกต์ {secretCode: "...", userName: "..."}
-                // เราต้องระบุ .userName เพื่อเอาชื่อมาโชว์ในช่องเลือกค่ะ
-                const name = member.userName; 
-                option.value = name;
-                option.text = name;
-                select.appendChild(option);
-            });
-        } else {
-            select.innerHTML = '<option value="" disabled selected>❌ ไม่พบรายชื่อใน MemberDB</option>';
+    async function loadMembers() {
+        try {
+            const response = await fetch(WEB_APP_URL);
+            const data = await response.json();
+            const select = document.getElementById('senderName');
+            
+            if (data.members && data.members.length > 0) {
+                select.innerHTML = '<option value="" disabled selected>--- เลือกชื่อของคุณครู ---</option>';
+                data.members.forEach(member => {
+                    let option = document.createElement('option');
+                    // ปรับบรรทัดนี้: เพื่อให้ดึงชื่อจาก Object ได้ถูกต้องทั้งในคอมและมือถือ
+                    const name = (typeof member === 'object') ? member.userName : member; 
+                    option.value = name;
+                    option.text = name;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = '<option value="" disabled selected>❌ ไม่พบรายชื่อใน MemberDB</option>';
+            }
+        } catch (error) {
+            console.error("Error loading members:", error);
+            document.getElementById('senderName').innerHTML = '<option value="" disabled selected>❌ โหลดรายชื่อล้มเหลว</option>';
         }
-    } catch (error) {
-        console.error("Error loading members:", error);
-        document.getElementById('senderName').innerHTML = '<option value="" disabled selected>❌ โหลดรายชื่อล้มเหลว</option>';
     }
-}
 
     // เรียกโหลดรายชื่อทันทีที่เปิดหน้าเว็บ
     loadMembers();
@@ -251,14 +267,20 @@ async function loadMembers() {
                     body: JSON.stringify(payload)
                 });
 
-               // ถ้าส่งสำเร็จ (Status 200-299)
+                // ถ้าส่งสำเร็จ (Status 200-299)
                 if (response.ok) {
                     loading.style.display = 'none';
+
+                    // --- ส่วนที่เพิ่ม: ล้างข้อมูลในฟอร์มทันทีที่ส่งสำเร็จ ---
+                    form.reset();
+                    document.getElementById('docDate').valueAsDate = new Date();
+                    textareas.forEach(el => el.style.height = 'auto'); // คืนค่าความสูงช่องข้อความ
+
                     Swal.fire({
                         icon: 'success',
                         title: 'ส่งเอกสารสำเร็จ!',
                         html: `
-                            <p class="mb-3">ระบบบันทึกข้อมูลเรียบร้อยแล้วค่ะ</p>
+                            <p class="mb-3">ระบบบันทึกข้อมูลและแจ้งเตือนเรียบร้อยแล้วค่ะ</p>
                             <div style="background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px dashed #cbd5e1;">
                                 <p class="small text-muted mb-2">คุณครูสามารถติดตามผลการพิจารณาได้ที่</p>
                                 <a href="https://joodami.github.io/PS-Sarabun-V.1/" 
@@ -270,12 +292,10 @@ async function loadMembers() {
                             </div>
                         `,
                         showConfirmButton: true,
-                        confirmButtonText: 'ตกลง',
+                        confirmButtonText: 'ตกลง', // คงข้อความเดิม
                         confirmButtonColor: '#64748b'
-                    }).then((result) => {
-                        // เมื่อกดปุ่มรับทราบ ให้รีโหลดหน้าเสนอเซ็นเพื่อเตรียมส่งใบใหม่
-                        location.reload();
                     });
+                    // ลบ location.reload() ออกเพื่อให้ Modal แจ้งเตือนไม่หายไปก่อนกดดูสถานะ
                 } else {
                     throw new Error('Server returned ' + response.status);
                 }
