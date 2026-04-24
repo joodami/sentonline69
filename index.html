@@ -199,18 +199,17 @@
                 const base64Data = reader.result.split(',')[1];
                 
                 // เตรียมข้อมูลส่งไป GAS
-                const payload = {
-                    date: new Date().toLocaleDateString('th-TH', { 
-                        year: 'numeric', month: 'long', day: 'numeric' 
-                    }),
-                    name: document.getElementById('senderName').value,
-                    title: document.getElementById('bookTitle').value,
-                    to: document.getElementById('sendTo').value,
-                    remarks: "ส่งผ่าน Web App",
-                    fileData: base64Data,
-                    fileName: file.name,
-                    fileType: file.type
-                };
+// ค้นหาส่วน payload ในไฟล์ index.html เดิม แล้วแทนที่ด้วยส่วนนี้ค่ะ
+const payload = {
+    date: formatDateThai(document.getElementById('docDate').value),
+    name: document.getElementById('senderName').value,
+    title: document.getElementById('bookTitle').value,
+    to: document.getElementById('sendTo').value, // ข้อมูลนี้ใช้แจ้งเตือนในไลน์ แต่ในชีทครูไม่ได้เก็บคอลัมน์นี้ พิมจึงแยกไว้ค่ะ
+    remarks: "ส่งผ่านระบบ Web App", // จะไปลงในคอลัมน์ 6 (หมายเหตุ)
+    fileData: base64Data,
+    fileName: file.name,
+    fileType: file.type
+};
 
                 // ส่งข้อมูลด้วย Fetch POST
                 const response = await fetch(WEB_APP_URL, {
